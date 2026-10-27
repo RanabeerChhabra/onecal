@@ -1,0 +1,357 @@
+<title>Onecal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lanes converge into one column — the hero draws it, every section after repeats the "many → one" shape. */
+:root {
+  --bg: #F3F6F5; --panel: #FFFFFF; --ink: #10201E; --muted: #55625F; --line: #D6DEDB;
+  --marigold: #E2A100; --marigold-soft: #FBEBC1; --teal: #17756B; --teal-soft: #D5EDE9;
+  --plum: #7A4E8C; --sky: #2F6FB1; --rose: #B5476A;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0B1514; --panel: #13211F; --ink: #E5EEEC; --muted: #9AABA7; --line: #263936;
+  --marigold: #F3B52B; --marigold-soft: #3A2E0E; --teal: #4CC0B1; --teal-soft: #12332F;
+  --plum: #B98ACB; --sky: #6FA8E3; --rose: #E3809F; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0B1514; --panel: #13211F; --ink: #E5EEEC; --muted: #9AABA7; --line: #263936;
+  --marigold: #F3B52B; --marigold-soft: #3A2E0E; --teal: #4CC0B1; --teal-soft: #12332F;
+  --plum: #B98ACB; --sky: #6FA8E3; --rose: #E3809F; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 400 17px/1.6 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.02em }
+h1 { font-size: clamp(2.6rem, 6.4vw, 5rem); line-height: 0.98; font-weight: 800 }
+h2 { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.05; font-weight: 700 }
+h3 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em }
+p { margin: 0 }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal) }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 34em }
+.mono { font-family: var(--mono) }
+a { color: inherit }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--body); padding: 14px 20px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; text-decoration: none }
+.btn.ghost { background: transparent; color: var(--ink) }
+.btn:focus-visible, button:focus-visible { outline: 3px solid var(--marigold); outline-offset: 3px }
+section { padding-block: clamp(56px, 9vw, 112px) }
+
+/* nav */
+nav.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; flex-wrap: wrap }
+.mark { display: flex; align-items: center; gap: 10px; font: 800 22px/1 var(--display); letter-spacing: -0.03em; text-decoration: none }
+.mark svg { width: 30px; height: 30px }
+.navlinks { display: flex; gap: 22px; font-size: 15px; color: var(--muted); flex-wrap: wrap }
+.navlinks a { text-decoration: none } .navlinks a:hover { color: var(--ink) }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: clamp(24px, 5vw, 56px) clamp(48px, 7vw, 88px) }
+.hero h1 .one { color: var(--marigold); display: inline-block; position: relative }
+.hero-copy { display: grid; gap: 22px }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap }
+.hero-note { font: 400 13px/1.5 var(--mono); color: var(--muted) }
+.merge { width: 100%; height: auto; max-width: 100% }
+.merge text { font-family: var(--mono) }
+.lane { fill: none; stroke: var(--line); stroke-width: 2 }
+.lane-live { fill: none; stroke-width: 2; stroke-dasharray: 6 10; animation: flow 1.6s linear infinite }
+@keyframes flow { to { stroke-dashoffset: -32 } }
+.cal-row { opacity: 0; animation: rowin 9s ease-out infinite }
+@keyframes rowin { 0%, 8% { opacity: 0; transform: translateX(10px) } 14%, 88% { opacity: 1; transform: none } 96%, 100% { opacity: 0 } }
+
+/* extraction demo */
+.demo { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 20px; align-items: center; margin-top: 40px }
+.mail, .event { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; min-width: 0 }
+.mail-head { display: grid; gap: 2px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 12px }
+.mail-head b { color: var(--ink); font-weight: 600 }
+.mail-body { font-size: 15.5px }
+.hl { border-radius: 4px; padding: 0 2px; animation: hl 6s ease-in-out infinite }
+.hl.b { animation-delay: .5s }
+@keyframes hl { 0%, 15% { background: transparent } 25%, 85% { background: var(--marigold-soft); box-shadow: inset 0 -2px 0 var(--marigold) } 100% { background: transparent } }
+.arrow { display: grid; justify-items: center; gap: 6px; font: 500 11px/1.3 var(--mono); color: var(--muted); text-align: center }
+.arrow svg { width: 64px; height: 24px }
+.arrow path { stroke: var(--teal); stroke-width: 2; fill: none; stroke-dasharray: 5 6; animation: flow 1.2s linear infinite }
+.event { border-left: 0; position: relative; overflow: hidden; animation: pop 6s ease-out infinite }
+.event::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--teal) }
+@keyframes pop { 0%, 30% { transform: translateY(6px); opacity: .35 } 40%, 90% { transform: none; opacity: 1 } 100% { opacity: .35 } }
+.event .tag { display: inline-block; font: 500 12px/1 var(--mono); background: var(--teal-soft); color: var(--teal); padding: 5px 8px; border-radius: 6px; margin-bottom: 10px }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 14px; margin-top: 12px }
+.kv dt { color: var(--muted); font-family: var(--mono); font-size: 12px; padding-top: 2px } .kv dd { margin: 0; overflow-wrap: anywhere }
+.conf { display: flex; align-items: center; gap: 10px; margin-top: 14px; font: 500 12px/1 var(--mono); color: var(--muted) }
+.bar { flex: 1; height: 6px; border-radius: 3px; background: var(--line); position: relative; overflow: hidden }
+.bar i { position: absolute; inset: 0 auto 0 0; width: 95%; background: var(--teal); border-radius: 3px; animation: fill 6s ease-out infinite }
+@keyframes fill { 0%, 30% { width: 0 } 50%, 100% { width: 95% } }
+
+/* steps */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 44px; border-top: 1.5px solid var(--ink) }
+.step { padding: 26px 24px 0 0; display: grid; gap: 10px; align-content: start }
+.step + .step { padding-left: 24px; border-left: 1px solid var(--line) }
+.step .n { font: 500 13px/1 var(--mono); color: var(--marigold) }
+.step p { color: var(--muted); font-size: 15.5px }
+
+/* features */
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-top: 44px }
+.feat { background: var(--panel); padding: 26px 24px; display: grid; gap: 10px; align-content: start }
+.feat p { color: var(--muted); font-size: 15px }
+.chip { display: inline-flex; gap: 6px; flex-wrap: wrap; font: 500 12px/1 var(--mono) }
+.chip span { padding: 5px 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line) }
+
+/* brief */
+.brief { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: clamp(28px, 5vw, 72px); align-items: center }
+.phone { width: min(320px, 100%); aspect-ratio: 9 / 18.5; max-width: 100%; margin: 0 auto; border-radius: 44px; padding: 12px; background: var(--ink) }
+.screen { height: 100%; border-radius: 34px; overflow: hidden; position: relative; padding: 44px 16px 16px; display: grid; align-content: start; gap: 10px;
+  background: radial-gradient(120% 70% at 30% 0%, #2B4F7A 0%, #172C47 55%, #0E1B2C 100%); color: #F4F7FB }
+.screen .date { text-align: center; font: 500 15px/1.2 var(--body); opacity: .85 }
+.screen .clock { text-align: center; font: 700 74px/1 var(--display); letter-spacing: -0.03em }
+.widgets { display: flex; gap: 8px; justify-content: center; margin: 4px 0 14px }
+.wdg { background: rgba(255,255,255,.16); border-radius: 14px; padding: 8px 11px; font-size: 11.5px; line-height: 1.35; min-width: 0 }
+.wdg small { display: block; opacity: .75; font-family: var(--mono); font-size: 10.5px }
+.note { background: rgba(255,255,255,.94); color: #14201F; border-radius: 16px; padding: 11px 13px; font-size: 13px; line-height: 1.4; transition: transform .4s, opacity .4s }
+.note .meta { display: flex; justify-content: space-between; font: 500 11px/1 var(--mono); color: #5B6866; margin-bottom: 5px }
+.note b { font-weight: 600 }
+.note.swap { transform: translateY(-6px); opacity: 0 }
+.brief-list { display: grid; gap: 14px; margin-top: 28px }
+.brief-list div { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 14px; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--line) }
+.brief-list .t { font: 500 14px/1.4 var(--mono); color: var(--marigold) }
+.brief-list p { color: var(--muted); font-size: 15.5px }
+
+/* teams */
+.teams { background: var(--ink); color: var(--bg); border-radius: 28px; padding: clamp(32px, 6vw, 72px) clamp(20px, 5vw, 64px); display: grid; gap: 36px }
+.teams .eyebrow { color: var(--marigold) }
+.teams .lede { color: color-mix(in srgb, var(--bg) 72%, transparent) }
+.tgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px }
+.tgrid div { display: grid; gap: 8px; align-content: start; border-top: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); padding-top: 16px }
+.tgrid p { color: color-mix(in srgb, var(--bg) 70%, transparent); font-size: 15px }
+.pill { justify-self: start; font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; border: 1px solid currentColor }
+.pill.live { color: var(--teal) } .pill.soon { color: var(--marigold) }
+
+/* cta + footer */
+.cta { display: grid; justify-items: center; text-align: center; gap: 20px }
+.cta .addr { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 8px 8px 8px 20px }
+.cta .addr span { font: 500 16px/1 var(--mono); user-select: all }
+.cta .btn { padding: 11px 16px }
+footer { padding-block: 32px 48px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 14px }
+
+@media (max-width: 860px) {
+  .hero, .brief { grid-template-columns: minmax(0, 1fr) }
+  .demo { grid-template-columns: minmax(0, 1fr) }
+  .arrow svg { transform: rotate(90deg) }
+  .steps { grid-template-columns: minmax(0, 1fr) }
+  .step, .step + .step { padding: 22px 0; border-left: 0 }
+  .step + .step { border-top: 1px solid var(--line) }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important }
+  .cal-row { opacity: 1 }
+  .moving { display: none }
+}
+</style>
+
+<div class="wrap">
+  <nav class="top" aria-label="Main">
+    <a class="mark" href="#top" aria-label="Onecal home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="5" width="28" height="25" rx="7" fill="var(--ink)"/><rect x="2" y="5" width="28" height="8" rx="4" fill="var(--marigold)"/><text x="16" y="26.5" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="14" fill="var(--bg)">1</text></svg>
+      Onecal
+    </a>
+    <div class="navlinks"><a href="#how">How it works</a><a href="#brief">Morning brief</a><a href="#teams">For teams</a></div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-copy">
+      <span class="eyebrow">For founders and teams who live in five inboxes</span>
+      <h1>Every inbox.<br>Every calendar.<br><span class="one">One calendar.</span></h1>
+      <p class="lede">Onecal reads your team's Gmail and Google Calendars, finds the meetings that are actually confirmed, and puts them on one shared calendar, deduped, tagged by who's in them, with the join link attached.</p>
+      <div class="hero-ctas"><a class="btn" href="#access">Get early access</a><a class="btn ghost" href="#how">See how it works</a></div>
+      <p class="hero-note">Runs inside Google Workspace · no servers · native Calendar app and widgets</p>
+    </div>
+
+    <svg class="merge" viewBox="0 0 580 440" role="img" aria-labelledby="mergeTitle">
+      <title id="mergeTitle">Five inboxes flowing into one shared calendar</title>
+      <g font-size="12">
+        <g transform="translate(8,46)"><rect width="150" height="34" rx="17" fill="var(--panel)" stroke="var(--line)"/><circle cx="18" cy="17" r="5" fill="var(--sky)"/><text x="32" y="21" fill="var(--ink)">priya@school.edu</text></g>
+        <g transform="translate(8,124)"><rect width="150" height="34" rx="17" fill="var(--panel)" stroke="var(--line)"/><circle cx="18" cy="17" r="5" fill="var(--plum)"/><text x="32" y="21" fill="var(--ink)">dev@school.edu</text></g>
+        <g transform="translate(8,202)"><rect width="150" height="34" rx="17" fill="var(--panel)" stroke="var(--line)"/><circle cx="18" cy="17" r="5" fill="var(--rose)"/><text x="32" y="21" fill="var(--ink)">sam@school.edu</text></g>
+        <g transform="translate(8,280)"><rect width="150" height="34" rx="17" fill="var(--panel)" stroke="var(--line)"/><circle cx="18" cy="17" r="5" fill="var(--teal)"/><text x="32" y="21" fill="var(--ink)">founders@acme.co</text></g>
+        <g transform="translate(8,358)"><rect width="150" height="34" rx="17" fill="var(--panel)" stroke="var(--line)"/><circle cx="18" cy="17" r="5" fill="var(--marigold)"/><text x="32" y="21" fill="var(--ink)">hello@acme.co</text></g>
+      </g>
+      <g>
+        <path id="p1" class="lane" d="M158 63 C 250 63, 250 220, 330 220"/>
+        <path id="p2" class="lane" d="M158 141 C 250 141, 260 220, 330 220"/>
+        <path id="p3" class="lane" d="M158 219 C 250 219, 260 220, 330 220"/>
+        <path id="p4" class="lane" d="M158 297 C 250 297, 260 220, 330 220"/>
+        <path id="p5" class="lane" d="M158 375 C 250 375, 250 220, 330 220"/>
+        <path class="lane-live" stroke="var(--sky)" d="M158 63 C 250 63, 250 220, 330 220"/>
+        <path class="lane-live" stroke="var(--plum)" d="M158 141 C 250 141, 260 220, 330 220" style="animation-delay:-.4s"/>
+        <path class="lane-live" stroke="var(--rose)" d="M158 219 C 250 219, 260 220, 330 220" style="animation-delay:-.8s"/>
+        <path class="lane-live" stroke="var(--teal)" d="M158 297 C 250 297, 260 220, 330 220" style="animation-delay:-1.2s"/>
+        <path class="lane-live" stroke="var(--marigold)" d="M158 375 C 250 375, 250 220, 330 220" style="animation-delay:-.2s"/>
+      </g>
+      <g class="moving">
+        <circle r="6" fill="var(--sky)"><animateMotion dur="3s" repeatCount="indefinite" begin="0s"><mpath href="#p1"/></animateMotion></circle>
+        <circle r="6" fill="var(--plum)"><animateMotion dur="3s" repeatCount="indefinite" begin="-0.7s"><mpath href="#p2"/></animateMotion></circle>
+        <circle r="6" fill="var(--rose)"><animateMotion dur="3s" repeatCount="indefinite" begin="-1.6s"><mpath href="#p3"/></animateMotion></circle>
+        <circle r="6" fill="var(--teal)"><animateMotion dur="3s" repeatCount="indefinite" begin="-2.2s"><mpath href="#p4"/></animateMotion></circle>
+        <circle r="6" fill="var(--marigold)"><animateMotion dur="3s" repeatCount="indefinite" begin="-1.1s"><mpath href="#p5"/></animateMotion></circle>
+      </g>
+      <g transform="translate(330,40)">
+        <rect width="242" height="360" rx="18" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+        <path d="M0 18 a18 18 0 0 1 18 -18 h206 a18 18 0 0 1 18 18 v28 h-242 z" fill="var(--ink)"/>
+        <text x="18" y="29" font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="15" fill="var(--bg)">Team calendar</text>
+        <text x="224" y="29" text-anchor="end" font-size="11" fill="var(--marigold)">Thu 29 Oct</text>
+        <g class="cal-row" style="animation-delay:0s"><rect x="14" y="62" width="214" height="52" rx="9" fill="var(--teal-soft)"/><rect x="14" y="62" width="4" height="52" fill="var(--teal)"/><text x="28" y="82" font-size="11" fill="var(--teal)">10:30 · [P+S]</text><text x="28" y="101" font-size="12.5" fill="var(--ink)">Intro with Maya (Sequoia)</text></g>
+        <g class="cal-row" style="animation-delay:.6s"><rect x="14" y="124" width="214" height="52" rx="9" fill="var(--marigold-soft)"/><rect x="14" y="124" width="4" height="52" fill="var(--marigold)"/><text x="28" y="144" font-size="11" fill="var(--marigold)">13:00 · [D]</text><text x="28" y="163" font-size="12.5" fill="var(--ink)">Demo with Northwind</text></g>
+        <g class="cal-row" style="animation-delay:1.2s"><rect x="14" y="186" width="214" height="52" rx="9" fill="var(--teal-soft)"/><rect x="14" y="186" width="4" height="52" fill="var(--teal)"/><text x="28" y="206" font-size="11" fill="var(--teal)">15:00 · [P+D+S]</text><text x="28" y="225" font-size="12.5" fill="var(--ink)">Accelerator interview</text></g>
+        <g class="cal-row" style="animation-delay:1.8s"><rect x="14" y="248" width="214" height="52" rx="9" fill="var(--bg)" stroke="var(--line)" stroke-dasharray="4 3"/><text x="28" y="268" font-size="11" fill="var(--muted)">17:30 · [S] · tentative</text><text x="28" y="287" font-size="12.5" fill="var(--ink)">(?) Coffee with Arjun</text></g>
+        <text x="18" y="334" font-size="11" fill="var(--muted)">4 meetings · 7 sources · 3 duplicates merged</text>
+      </g>
+    </svg>
+  </header>
+</div>
+
+<section id="how" style="background: var(--panel); border-block: 1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">How it reads email</span>
+    <h2 style="margin-top:14px; max-width: 16em">"Thursday at 4 works" becomes a meeting, at the right time, in the right timezone.</h2>
+    <div class="demo">
+      <article class="mail" aria-label="Example email">
+        <div class="mail-head"><span><b>Maya Chen</b> &lt;maya@sequoia.example&gt;</span><span>Sent Mon 26 Oct, 09:02 IST · Re: Intro call</span></div>
+        <p class="mail-body">Hi Priya, great to connect. <span class="hl">Thursday at 4</span> works on our side, let's do 30 minutes. I'll send a <span class="hl b">Zoom</span> link. Looping in Sam.</p>
+      </article>
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 64 24"><path d="M2 12 H56 M48 4 L58 12 L48 20"/></svg>resolves against<br>the sent date</div>
+      <article class="event" aria-label="Resulting calendar event">
+        <span class="tag">[P+S] confirmed</span>
+        <h3>Intro call with Maya (Sequoia)</h3>
+        <dl class="kv">
+          <dt>when</dt><dd>Thu 29 Oct, 16:00–16:30 IST</dd>
+          <dt>join</dt><dd>zoom.us/j/81234567890</dd>
+          <dt>source</dt><dd>Email in priya@school.edu</dd>
+        </dl>
+        <div class="conf"><span>confidence</span><span class="bar"><i></i></span><span>0.95</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Setup</span>
+    <h2 style="margin-top:14px">Live in an afternoon.</h2>
+    <div class="steps">
+      <div class="step"><span class="n">01 · connect</span><h3>Add each account</h3><p>Onecal runs inside each Google account, so mail never leaves Workspace except to extract a date. Five minutes per inbox.</p></div>
+      <div class="step"><span class="n">02 · preview</span><h3>Dry run first</h3><p>See exactly what it would add from the last two weeks, with the quote it relied on, before anything touches your calendar.</p></div>
+      <div class="step"><span class="n">03 · sync</span><h3>Leave it running</h3><p>It checks every two hours, follows reschedules and cancellations, and writes every decision to a log you can audit.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <span class="eyebrow">What it handles</span>
+    <h2 style="margin-top:14px">The messy parts of meetings, handled.</h2>
+    <div class="features">
+      <div class="feat"><h3>One event, not four</h3><p>The same invite in three inboxes and a calendar becomes a single event, matched by invite ID, thread, join link and attendees.</p><div class="chip"><span>iCalUID</span><span>thread</span><span>zoom key</span></div></div>
+      <div class="feat"><h3>Moved? Cancelled?</h3><p>"Can we push to Friday 11?" moves the event. "Need to cancel Monday" removes it, for everyone, even if the invite still sits in someone's calendar.</p></div>
+      <div class="feat"><h3>Tagged by who's in it</h3><p>Every title starts with the people involved, so the whole team sees who is where without opening a thing.</p><div class="chip"><span>[P]</span><span>[P+S]</span><span>[P+D+S]</span></div></div>
+      <div class="feat"><h3>Unsure? It says so</h3><p>Confirmed meetings go straight on. Strongly implied ones get a (?) and a tentative mark. Vague "free next week?" threads stay off.</p><div class="chip"><span>≥ 0.8 add</span><span>0.6–0.8 (?)</span><span>&lt; 0.6 log</span></div></div>
+      <div class="feat"><h3>Noise stays out</h3><p>Newsletters, webinars, flight receipts and university class timetables never make it onto the team calendar.</p></div>
+      <div class="feat"><h3>Everything links back</h3><p>Each event carries the join link and a link to every email or calendar entry it came from, plus the line that set the time.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="brief" style="background: var(--panel); border-block: 1px solid var(--line)">
+  <div class="wrap brief">
+    <div>
+      <span class="eyebrow">Morning brief</span>
+      <h2 style="margin-top:14px">Your team's day, on your lock screen at 7.</h2>
+      <p class="lede" style="margin-top:18px">A short email at 6:45 and an all-day "☀ Today" line at the top of the calendar that rewrites itself every two hours with what's left. It works with the Calendar app and widgets you already have.</p>
+      <div class="brief-list">
+        <div><span class="t">06:45</span><p>Email to everyone: the whole team's meetings, rooms and join links.</p></div>
+        <div><span class="t">07:00</span><p>Lock-screen alert with the day in one line.</p></div>
+        <div><span class="t">every 2h</span><p>"☀ Left today" updates as meetings finish.</p></div>
+      </div>
+    </div>
+    <div class="phone" aria-label="Phone lock screen showing the Onecal morning brief">
+      <div class="screen">
+        <p class="date">Thursday 29 October</p>
+        <p class="clock" id="clock">7:00</p>
+        <div class="widgets">
+          <div class="wdg"><small>Up next · <span id="nextTime">10:30</span></small><span id="nextTitle">Intro with Maya</span></div>
+          <div class="wdg"><small>Today</small><span id="leftCount">4 left</span></div>
+        </div>
+        <div class="note" id="note">
+          <div class="meta"><span>Calendar</span><span id="noteTime">now</span></div>
+          <b id="noteTitle">☀ Today: 10:30 Intro with Maya · 13:00 Demo with Northwind · 15:00 Accelerator interview</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="teams">
+  <div class="wrap">
+    <div class="teams">
+      <div style="display:grid; gap:16px">
+        <span class="eyebrow">For teams</span>
+        <h2 style="max-width: 15em">Built for three founders. Ready for the whole company next.</h2>
+        <p class="lede">Today Onecal runs in each person's own Google account. The team edition adds one-click admin install and the controls security teams ask for.</p>
+      </div>
+      <div class="tgrid">
+        <div><span class="pill live">Today</span><h3>Stays in Google</h3><p>Runs as Apps Script inside each account. Read-only Gmail access, no servers, no separate database.</p></div>
+        <div><span class="pill live">Today</span><h3>Your choice of model</h3><p>Claude or DeepSeek for the date extraction. Only threads that look like scheduling are ever sent.</p></div>
+        <div><span class="pill soon">Team edition</span><h3>Admin install</h3><p>A Workspace admin enables it for chosen groups at once, instead of a setup per inbox.</p></div>
+        <div><span class="pill soon">Team edition</span><h3>Policies and audit</h3><p>Which inboxes are read, what is shared, and an exportable log of every decision.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="access" style="padding-top:0">
+  <div class="wrap cta">
+    <span class="eyebrow">Early access</span>
+    <h2 style="max-width: 14em">Stop checking five calendars.</h2>
+    <p class="lede">We're onboarding a handful of founding teams. Write to us and we'll set Onecal up with you.</p>
+    <div class="addr"><span id="addr">founders@tryamp.in</span><button class="btn" id="copy" type="button">Copy email</button></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer><span>Onecal</span><span class="mono" style="font-size:12.5px">many inboxes → one calendar</span></footer>
+</div>
+
+<script>
+(function () {
+  var copy = document.getElementById('copy');
+  copy.addEventListener('click', function () {
+    var text = document.getElementById('addr').textContent;
+    var done = function () { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy email'; }, 1800); };
+    try {
+      navigator.clipboard.writeText(text).then(done, select);
+    } catch (e) { select(); }
+    function select() { var r = document.createRange(); r.selectNodeContents(document.getElementById('addr')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  });
+
+  var states = [
+    { clock: '7:00', next: ['10:30', 'Intro with Maya'], left: '4 left', when: 'now', title: '☀ Today: 10:30 Intro with Maya · 13:00 Demo with Northwind · 15:00 Accelerator interview' },
+    { clock: '11:02', next: ['13:00', 'Demo with Northwind'], left: '3 left', when: '11:00', title: '☀ Left today: 13:00 Demo with Northwind · 15:00 Accelerator interview · 17:30 (?) Coffee' },
+    { clock: '14:51', next: ['15:00', 'Accelerator interview'], left: '2 left', when: '14:50', title: 'Accelerator interview in 10 minutes · Room 4.2' },
+    { clock: '19:03', next: ['Fri', 'Board prep'], left: 'done', when: '19:00', title: '☀ Today: all 4 meetings done' }
+  ];
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var i = 0, note = document.getElementById('note');
+  setInterval(function () {
+    i = (i + 1) % states.length;
+    var s = states[i];
+    note.classList.add('swap');
+    setTimeout(function () {
+      document.getElementById('clock').textContent = s.clock;
+      document.getElementById('nextTime').textContent = s.next[0];
+      document.getElementById('nextTitle').textContent = s.next[1];
+      document.getElementById('leftCount').textContent = s.left;
+      document.getElementById('noteTime').textContent = s.when;
+      document.getElementById('noteTitle').textContent = s.title;
+      note.classList.remove('swap');
+    }, 400);
+  }, 3200);
+})();
+</script>
