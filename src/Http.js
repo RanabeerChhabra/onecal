@@ -23,14 +23,18 @@ var GoogleApi = (function () {
     return { code: code, json: json, text: text };
   }
 
-  function retryable(code) { return code === 429 || code >= 500; }
+  // Gmail answers "too many requests" with 403 rateLimitExceeded as well as 429. A freshly enabled API
+  // also returns 403 for a minute or two.
+  function retryable(code, text) {
+    return code === 429 || code >= 500 || (code === 403 && /rate ?limit|not been used|disabled/i.test(String(text || '')));
+  }
 
   function get(token, url, params) {
     var full = url + query(params);
     for (var attempt = 0; ; attempt++) {
       var r = parse(UrlFetchApp.fetch(full, request(token, full)));
       if (r.code >= 200 && r.code < 300) return r.json;
-      if (retryable(r.code) && attempt < 3) { Utilities.sleep(1000 * Math.pow(2, attempt)); continue; }
+      if (retryable(r.code, r.text) && attempt < 3) { Utilities.sleep(1000 * Math.pow(2, attempt)); continue; }
       var err = new Error('Google API ' + r.code + ' for ' + url.replace(/\?.*/, '') + ': ' + String(r.text).slice(0, 300));
       err.code = r.code;
       throw err;
@@ -47,11 +51,12 @@ var GoogleApi = (function () {
       resps.forEach(function (resp, j) {
         var r = parse(resp);
         if (r.code >= 200 && r.code < 300) { out.push(r.json); return; }
-        if (retryable(r.code)) {
+        if (retryable(r.code, r.text)) { // one quick retry only, so a run of failures can't eat the time budget
           Utilities.sleep(1500);
-          try { out.push(get(token, slice[j])); return; } catch (e) { /* fall through */ }
+          r = parse(UrlFetchApp.fetch(slice[j], request(token, slice[j])));
+          if (r.code >= 200 && r.code < 300) { out.push(r.json); return; }
         }
-        console.warn('GET failed ' + r.code + ' ' + slice[j]);
+        console.warn('GET failed ' + r.code + ' ' + slice[j] + ' ' + String(r.text).replace(/\s+/g, ' ').slice(0, 200));
         out.push(null);
       });
     }

@@ -68,7 +68,7 @@ function runSync_(mode) {
     SharedStore.pruneTombs(now);
   }
   AgentLog.add({ action: 'run', reason: (mode.dry ? 'dry run: ' : '') + acct.email + ': ' + stats.threads + ' threads read, ' +
-    stats.candidates + ' candidates, ' + stats.llm + ' sent to Claude, ' + res.ops.length + ' calendar changes' +
+    stats.candidates + ' candidates, ' + stats.llm + ' sent to ' + cfg.provider + ', ' + res.ops.length + ' calendar changes' +
     (mode.dry ? ' (not applied)' : '') + ', ' + Math.round((Date.now() - t0) / 1000) + 's' });
   AgentLog.flush();
 }

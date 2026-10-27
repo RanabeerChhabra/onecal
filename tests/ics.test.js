@@ -30,3 +30,15 @@ test('ics: METHOD:CANCEL becomes a cancelled observation', () => {
   assert.strictEqual(r.obs[0].status, 'cancelled');
   assert.strictEqual(r.obs[0].ical, '5q8v2kq0abcd1234@google.com@');
 });
+
+test('university classes are left out, meetings with similar words are kept', () => {
+  const acct = { email: 'hardik.personal@gmail.com', founder: 'H' };
+  const ev = (summary, extra) => Object.assign({ summary, status: 'confirmed', updated: '2026-10-26T05:00:00Z',
+    start: { dateTime: '2026-11-09T10:10:00+05:30' }, end: { dateTime: '2026-11-09T11:40:00+05:30' } }, extra || {});
+  const skip = (e) => core.Sources.fromCalendarEvent(e, acct, cfg()).skip;
+  assert.strictEqual(skip(ev('Macroeconomic Theory I (Ronit Mukherji) (ECO-2201-2)', { recurringEventId: 'r1' })), 'university class');
+  assert.strictEqual(skip(ev('CS-1104 Intro to CS')), 'university class');
+  assert.strictEqual(skip(ev('Weekly Lecture: Statistics', { recurringEventId: 'r2' })), 'university class');
+  assert.strictEqual(skip(ev('Masterclass prep with Priya', { attendees: [{ email: 'p@x.com' }] })), undefined);
+  assert.strictEqual(skip(ev('Call with Sequoia')), undefined);
+});

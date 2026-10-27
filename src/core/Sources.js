@@ -25,8 +25,18 @@ var Sources = (function () {
   }
 
   // Google Calendar API v3 event -> observation, or { skip: reason }.
+  // University classes on the founders' student calendars, e.g. "Macroeconomic Theory I (ECO-2201-2)".
+  var COURSE_CODE = /\b[A-Z]{2,5}-\d{3,4}\b/;
+  var CLASS_WORDS = /\b(lecture|tutorial|recitation|lab section|class)\b/i;
+  function looksLikeClass(title, recurringSolo) {
+    title = String(title || '');
+    return COURSE_CODE.test(title) || (recurringSolo && CLASS_WORDS.test(title));
+  }
+
   function fromCalendarEvent(ev, acct, cfg) {
     if (!ev || !ev.start) return { skip: 'no start' };
+    var others = (ev.attendees || []).filter(function (a) { return !a.self; });
+    if (looksLikeClass(ev.summary, !!ev.recurringEventId && !others.length)) return { skip: 'university class' };
     if (SKIP_EVENT_TYPES[ev.eventType]) return { skip: 'event type ' + ev.eventType };
     var allDay = !ev.start.dateTime;
     if (allDay && !cfg.includeAllDay) return { skip: 'all-day event' };
@@ -74,6 +84,7 @@ var Sources = (function () {
     var method = cal.method || 'REQUEST';
     if (method === 'REPLY' || method === 'COUNTER' || method === 'REFRESH') return { skip: 'invite ' + method.toLowerCase() };
     if (!ve.start) return { skip: 'invite without start' };
+    if (looksLikeClass(ve.summary, false)) return { skip: 'university class' };
     if (ve.allDay && !cfg.includeAllDay) return { skip: 'all-day invite' };
     if (ve.recurring && !ve.recurrenceId) return { skip: 'recurring invite (handled by calendar sync)' };
     var cancelled = method === 'CANCEL' || ve.status === 'CANCELLED';

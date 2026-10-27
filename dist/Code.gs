@@ -1,4 +1,4 @@
-// Founders Meeting Agent — single-file build 2026-10-27 08:51 UTC. Do not edit here; edit src/ and run `npm run bundle`.
+// Founders Meeting Agent — single-file build 2026-10-27 18:22 UTC. Do not edit here; edit src/ and run `npm run bundle`.
 // Paste this whole file into Code.gs of a new Apps Script project in each account. See README.
 
 // ===== Founders Meeting Agent: shared configuration =====
@@ -499,8 +499,18 @@ var Sources = (function () {
   }
 
   // Google Calendar API v3 event -> observation, or { skip: reason }.
+  // University classes on the founders' student calendars, e.g. "Macroeconomic Theory I (ECO-2201-2)".
+  var COURSE_CODE = /\b[A-Z]{2,5}-\d{3,4}\b/;
+  var CLASS_WORDS = /\b(lecture|tutorial|recitation|lab section|class)\b/i;
+  function looksLikeClass(title, recurringSolo) {
+    title = String(title || '');
+    return COURSE_CODE.test(title) || (recurringSolo && CLASS_WORDS.test(title));
+  }
+
   function fromCalendarEvent(ev, acct, cfg) {
     if (!ev || !ev.start) return { skip: 'no start' };
+    var others = (ev.attendees || []).filter(function (a) { return !a.self; });
+    if (looksLikeClass(ev.summary, !!ev.recurringEventId && !others.length)) return { skip: 'university class' };
     if (SKIP_EVENT_TYPES[ev.eventType]) return { skip: 'event type ' + ev.eventType };
     var allDay = !ev.start.dateTime;
     if (allDay && !cfg.includeAllDay) return { skip: 'all-day event' };
@@ -548,6 +558,7 @@ var Sources = (function () {
     var method = cal.method || 'REQUEST';
     if (method === 'REPLY' || method === 'COUNTER' || method === 'REFRESH') return { skip: 'invite ' + method.toLowerCase() };
     if (!ve.start) return { skip: 'invite without start' };
+    if (looksLikeClass(ve.summary, false)) return { skip: 'university class' };
     if (ve.allDay && !cfg.includeAllDay) return { skip: 'all-day invite' };
     if (ve.recurring && !ve.recurrenceId) return { skip: 'recurring invite (handled by calendar sync)' };
     var cancelled = method === 'CANCEL' || ve.status === 'CANCELLED';
@@ -613,7 +624,8 @@ var Extract = (function () {
     '  investor/accelerator/interview slots that were accepted or assigned, and forwarded invites.',
     '- Do NOT count: proposals or questions not yet accepted ("how about Thursday?", "free next week?"),',
     '  lists of available slots, "let\'s find a time", newsletters, promotions, open-registration webinars/events/livestreams,',
-    '  receipts, flights, hotels, deliveries, deadlines, or reminders that are not meetings.',
+    '  receipts, flights, hotels, deliveries, deadlines, or reminders that are not meetings,',
+    '  university classes, lectures, tutorials, exams and course announcements.',
     '',
     'Dates and times:',
     '- Every message has a "Sent" timestamp. Resolve relative dates ("Thursday", "tomorrow", "the 26th") against the Sent',
@@ -1217,14 +1229,18 @@ var GoogleApi = (function () {
     return { code: code, json: json, text: text };
   }
 
-  function retryable(code) { return code === 429 || code >= 500; }
+  // Gmail answers "too many requests" with 403 rateLimitExceeded as well as 429. A freshly enabled API
+  // also returns 403 for a minute or two.
+  function retryable(code, text) {
+    return code === 429 || code >= 500 || (code === 403 && /rate ?limit|not been used|disabled/i.test(String(text || '')));
+  }
 
   function get(token, url, params) {
     var full = url + query(params);
     for (var attempt = 0; ; attempt++) {
       var r = parse(UrlFetchApp.fetch(full, request(token, full)));
       if (r.code >= 200 && r.code < 300) return r.json;
-      if (retryable(r.code) && attempt < 3) { Utilities.sleep(1000 * Math.pow(2, attempt)); continue; }
+      if (retryable(r.code, r.text) && attempt < 3) { Utilities.sleep(1000 * Math.pow(2, attempt)); continue; }
       var err = new Error('Google API ' + r.code + ' for ' + url.replace(/\?.*/, '') + ': ' + String(r.text).slice(0, 300));
       err.code = r.code;
       throw err;
@@ -1241,11 +1257,12 @@ var GoogleApi = (function () {
       resps.forEach(function (resp, j) {
         var r = parse(resp);
         if (r.code >= 200 && r.code < 300) { out.push(r.json); return; }
-        if (retryable(r.code)) {
+        if (retryable(r.code, r.text)) { // one quick retry only, so a run of failures can't eat the time budget
           Utilities.sleep(1500);
-          try { out.push(get(token, slice[j])); return; } catch (e) { /* fall through */ }
+          r = parse(UrlFetchApp.fetch(slice[j], request(token, slice[j])));
+          if (r.code >= 200 && r.code < 300) { out.push(r.json); return; }
         }
-        console.warn('GET failed ' + r.code + ' ' + slice[j]);
+        console.warn('GET failed ' + r.code + ' ' + slice[j] + ' ' + String(r.text).replace(/\s+/g, ' ').slice(0, 200));
         out.push(null);
       });
     }
@@ -1909,7 +1926,7 @@ function runSync_(mode) {
     SharedStore.pruneTombs(now);
   }
   AgentLog.add({ action: 'run', reason: (mode.dry ? 'dry run: ' : '') + acct.email + ': ' + stats.threads + ' threads read, ' +
-    stats.candidates + ' candidates, ' + stats.llm + ' sent to Claude, ' + res.ops.length + ' calendar changes' +
+    stats.candidates + ' candidates, ' + stats.llm + ' sent to ' + cfg.provider + ', ' + res.ops.length + ' calendar changes' +
     (mode.dry ? ' (not applied)' : '') + ', ' + Math.round((Date.now() - t0) / 1000) + 's' });
   AgentLog.flush();
 }
