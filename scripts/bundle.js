@@ -5,8 +5,8 @@ const path = require('path');
 
 const SRC = path.join(__dirname, '..', 'src');
 const OUT = path.join(__dirname, '..', 'dist');
-const CORE = ['Util', 'Links', 'Settings', 'Prefilter', 'Ics', 'Sources', 'Extract', 'Render', 'Reconcile'];
-const ADAPTERS = ['Http', 'Self', 'GmailApi', 'CalApi', 'Claude', 'DeepSeek', 'AgentLog', 'SharedStore', 'Backfill', 'Sync', 'Setup'];
+const CORE = ['Util', 'Links', 'Settings', 'Prefilter', 'Ics', 'Sources', 'Extract', 'Render', 'Reconcile', 'Brief'];
+const ADAPTERS = ['Http', 'Self', 'GmailApi', 'CalApi', 'Claude', 'DeepSeek', 'AgentLog', 'SharedStore', 'Backfill', 'Sync', 'Setup', 'Morning'];
 
 const coreFiles = fs.readdirSync(path.join(SRC, 'core')).map((f) => f.replace(/\.js$/, ''));
 const srcFiles = fs.readdirSync(SRC).filter((f) => f.endsWith('.js')).map((f) => f.replace(/\.js$/, ''));

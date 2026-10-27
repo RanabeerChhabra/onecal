@@ -44,6 +44,7 @@ function createWorld(now) {
     claudeReplies: [],  // [{ marker, reply }]
     batches: {},
     calls: { claude: 0, deepseek: 0, batchCreates: 0, eventWrites: 0 },
+    mails: [], pushes: [],
     deepseekEmptyReplies: 0, // the next N DeepSeek calls return empty content (a known JSON-mode glitch)
     seq: 0,
     staleEvents: null   // when set, shared-calendar reads return this snapshot (simulates a race)
@@ -72,6 +73,7 @@ function createWorld(now) {
     opts = opts || {};
     const u = new URL(url);
     const q = Object.fromEntries(u.searchParams.entries());
+    if (u.host === 'ntfy.sh') { world.pushes.push(JSON.parse(opts.payload)); return json(200, { id: 'n' + (++world.seq) }); }
     if (u.host === 'api.deepseek.com') {
       if (!opts.headers || opts.headers.Authorization !== 'Bearer ds-test') return json(401, { error: { message: 'Authentication Fails', type: 'authentication_error' } });
       if (world.deepseekNoBalance) return json(402, { error: { message: 'Insufficient Balance', type: 'unknown_error' } });
@@ -198,6 +200,7 @@ function createWorld(now) {
         static now() { return now(); }
       },
       Session: { getEffectiveUser: () => ({ getEmail: () => email }) },
+      MailApp: { sendEmail: (m) => { world.mails.push(Object.assign({ from: email }, m)); } },
       PropertiesService: { getScriptProperties: () => ({
         getProperty: (k) => (k in props ? props[k] : null),
         setProperty: (k, v) => { props[k] = String(v); },
@@ -224,7 +227,8 @@ function createWorld(now) {
       ScriptApp: {
         getOAuthToken: () => 'at:' + email,
         getProjectTriggers: () => triggers.map((h) => ({ getHandlerFunction: () => h })),
-        newTrigger: (h) => ({ timeBased: () => ({ everyMinutes: () => ({ create: () => { triggers.push(h); } }) }) }),
+        // Any chain of builder calls (timeBased().atHour(7).everyDays(1)...) ending in create().
+        newTrigger: (h) => { const b = new Proxy({}, { get: (_, k) => (k === 'create' ? () => { triggers.push(h); } : () => b) }); return b; },
         deleteTrigger: (t) => { triggers = triggers.filter((h) => h !== t.getHandlerFunction()); }
       }
     });

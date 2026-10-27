@@ -4,7 +4,7 @@ const path = require('path');
 const vm = require('vm');
 
 const CORE = path.join(__dirname, '..', 'src', 'core');
-const ORDER = ['Util', 'Links', 'Settings', 'Prefilter', 'Ics', 'Sources', 'Extract', 'Render', 'Reconcile'];
+const ORDER = ['Util', 'Links', 'Settings', 'Prefilter', 'Ics', 'Sources', 'Extract', 'Render', 'Reconcile', 'Brief'];
 
 function loadCore() {
   const ctx = vm.createContext({ console, Intl, Date, JSON, Math });
