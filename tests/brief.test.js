@@ -56,7 +56,7 @@ test('brief end to end: owner emails everyone and puts one "☀ Today" event on 
   owner.ctx.sendMorningBrief();
   assert.deepStrictEqual(world.mails.map((m) => m.to), ['ranabeer@school.example',
     'hardik@school.example', 'anshul@school.example']);
-  assert.ok(world.mails.every((m) => m.subject === 'Wednesday 28 Oct: 3 meetings, first at 13:00'));
+  assert.ok(world.mails.every((m) => m.subject === '☀ Wednesday 28 Oct: 3 meetings, first at 13:00'));
   assert.match(world.mails[0].body, /14:00  Chat with Prof\. Jane Doe \(Brevity\) \[R\+H\+A\] · Room 12/);
   assert.deepStrictEqual(world.pushes, []);
 
@@ -87,4 +87,26 @@ test('brief end to end: owner emails everyone and puts one "☀ Today" event on 
   assert.strictEqual(briefEvents().length, 0);
 
   assert.throws(() => r.ctx.sendMorningBrief(), /runs from founders@tryamp\.in only/);
+});
+
+test('the agent does not read its own brief email back as a meeting', () => {
+  let clock = NOW;
+  const world = createWorld(() => clock);
+  const owner = world.account('founders@tryamp.in');
+  const H = 'hardik@school.example';
+  const hardik = world.account(H);
+  for (const c of [owner, hardik]) { c.props.DEEPSEEK_API_KEY = 'ds-test'; c.props.SYNC_EVERY_MIN = '0'; }
+  owner.ctx.setup();
+  hardik.ctx.setup();
+  hardik.ctx.syncAll(); // first run: history starts here
+  world.deliver(H, 'brief1', [{ from: 'Founders Meeting Agent <founders@tryamp.in>', to: H,
+    subject: '☀ Wednesday 28 Oct: 1 meeting, first at 13:00', date: '2026-10-28T06:45:00+05:30',
+    body: '13:00  Quick Chat | Alex [R] · online' }]);
+  world.replyWhenPromptContains('Quick Chat | Alex [R]', { meetings: [{ known_id: null, status: 'confirmed', title: 'Quick Chat | Alex',
+    with: ['Alex'], attendee_emails: [], start: '2026-10-28T13:00:00+05:30', end: null, timezone: 'Asia/Kolkata',
+    location: null, join_url: null, confidence: 0.95, evidence: '13:00 Quick Chat' }] });
+  const calls = world.calls.deepseek;
+  hardik.ctx.syncAll();
+  assert.strictEqual(world.calls.deepseek, calls, 'brief email was not sent to the model');
+  assert.ok(!world.sharedEvents().some((e) => /Alex/.test(e.summary)));
 });

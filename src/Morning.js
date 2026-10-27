@@ -33,7 +33,7 @@ function sendMorningBrief() {
   var b = todayBrief_();
   if (b.brief.count) {
     CONFIG.founders.forEach(function (f) {
-      try { MailApp.sendEmail({ to: f.emails[0], subject: b.brief.title, body: b.brief.text, htmlBody: b.brief.html, name: 'Founders Meeting Agent' }); }
+      try { MailApp.sendEmail({ to: f.emails[0], subject: '☀ ' + b.brief.title, body: b.brief.text, htmlBody: b.brief.html, name: 'Founders Meeting Agent' }); }
       catch (e) { console.warn('Brief email to ' + f.name + ' failed: ' + e.message); }
     });
   }
@@ -63,8 +63,16 @@ function todayBrief_() {
 function putTodayItem_(t) {
   var tz = t.cfg.defaultTz, b = t.brief;
   var date = Util.isoInTz(t.day.start, tz).slice(0, 10);
-  var existing = (Calendar.Events.list(t.calId, { privateExtendedProperty: 'fm_brief=' + date, singleEvents: true, maxResults: 5 }).items || [])
-    .filter(function (e) { return e.status !== 'cancelled'; });
+  var find = function (key) {
+    return (Calendar.Events.list(t.calId, { privateExtendedProperty: 'fm_brief=' + key, singleEvents: true, maxResults: 5 }).items || [])
+      .filter(function (e) { return e.status !== 'cancelled'; });
+  };
+  // Older builds made a timed 7:10 event (keyed by the UTC date); replace it with the all-day item.
+  var oldKey = new Date(t.day.start).toISOString().slice(0, 10);
+  (oldKey === date ? [] : find(oldKey)).concat(find(date)).forEach(function (e) {
+    if (!e.start.date) Calendar.Events.remove(t.calId, e.id);
+  });
+  var existing = find(date).filter(function (e) { return e.start.date; });
   if (!b.count) {
     existing.forEach(function (e) { Calendar.Events.remove(t.calId, e.id); });
     return;

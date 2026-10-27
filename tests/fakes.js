@@ -104,7 +104,11 @@ function createWorld(now) {
         const ids = box.newIds.splice(0);
         return json(200, { historyId: String(2000 + (++world.seq)), history: ids.map((id) => ({ messagesAdded: [{ message: { id: id + '-x', threadId: id, labelIds: ['INBOX'] } }] })) });
       }
-      if (p === 'threads') return json(200, { threads: Object.keys(box.threads).map((id) => ({ id })) });
+      if (p === 'threads') {
+        let ids = Object.keys(box.threads);
+        if (/Founders Meeting Agent/.test(q.q || '')) ids = ids.filter((id) => box.threads[id].every((m) => /Founders Meeting Agent/.test(m.from)));
+        return json(200, { threads: ids.map((id) => ({ id })) });
+      }
       const mt = p.match(/^threads\/(.+)$/);
       if (mt) return json(200, rawThread(mt[1], box.threads[mt[1]]));
     }

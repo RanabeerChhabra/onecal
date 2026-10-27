@@ -26,6 +26,14 @@ var Prefilter = (function () {
   }
 
   // A thread is a candidate if any of its recent messages is.
+  // The agent's own morning-brief emails (sender name "Founders Meeting Agent"). They list meetings, so
+  // without this the agent would read its own digest back as a new source.
+  var AGENT_SENDER = /Founders Meeting Agent/i;
+  function isAgentThread(thread) {
+    var msgs = thread.messages || [];
+    return msgs.length > 0 && msgs.every(function (m) { return AGENT_SENDER.test(m.from || ''); });
+  }
+
   function checkThread(thread) {
     var msgs = (thread.messages || []).slice(-6);
     var last = { candidate: false, reason: 'empty thread' };
@@ -37,5 +45,5 @@ var Prefilter = (function () {
     return last;
   }
 
-  return { checkMessage: checkMessage, checkThread: checkThread };
+  return { checkMessage: checkMessage, checkThread: checkThread, isAgentThread: isAgentThread };
 })();

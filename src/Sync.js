@@ -53,7 +53,8 @@ function runSync_(mode) {
       ids = GmailApi.listThreads(token, 'newer_than:' + cfg.dryRunDays + 'd ' + GmailApi.SEARCH, null, cfg.dryRunMaxThreads).ids;
     } else {
       var inc = incrementalThreadIds_(acct, token, now);
-      ids = inc.ids;
+      // Recent brief emails are always re-checked, so any meeting they were mistaken for gets cleared.
+      ids = Util.uniq(inc.ids.concat(GmailApi.listThreads(token, 'from:("Founders Meeting Agent") newer_than:7d', null, 20).ids));
       patches[acct.email] = inc.patch;
     }
     var threads = GmailApi.getThreads(token, ids);
@@ -172,6 +173,10 @@ function planThread_(th, acct, meetings, cfg, now, updates, jobs) {
   var scope = Sources.threadScope(acct, th.id);
   var asOf = th.messages[th.messages.length - 1].date;
   var linked = meetings.some(function (m) { return m.obs.some(function (o) { return o.src === scope; }); });
+  if (Prefilter.isAgentThread(th)) {
+    if (linked) updates.push({ scope: scope, kind: 'email', asOf: asOf, obs: [] });
+    return false;
+  }
   var pf = Prefilter.checkThread(th);
   if (!pf.candidate && !linked) return false;
 

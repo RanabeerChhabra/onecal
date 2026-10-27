@@ -1,4 +1,4 @@
-// Founders Meeting Agent — single-file build 2026-10-27 19:25 UTC. Do not edit here; edit src/ and run `npm run bundle`.
+// Founders Meeting Agent — single-file build 2026-10-27 19:32 UTC. Do not edit here; edit src/ and run `npm run bundle`.
 // Paste this whole file into Code.gs of a new Apps Script project in each account. See README.
 
 // ===== Founders Meeting Agent: shared configuration =====
@@ -319,6 +319,14 @@ var Prefilter = (function () {
   }
 
   // A thread is a candidate if any of its recent messages is.
+  // The agent's own morning-brief emails (sender name "Founders Meeting Agent"). They list meetings, so
+  // without this the agent would read its own digest back as a new source.
+  var AGENT_SENDER = /Founders Meeting Agent/i;
+  function isAgentThread(thread) {
+    var msgs = thread.messages || [];
+    return msgs.length > 0 && msgs.every(function (m) { return AGENT_SENDER.test(m.from || ''); });
+  }
+
   function checkThread(thread) {
     var msgs = (thread.messages || []).slice(-6);
     var last = { candidate: false, reason: 'empty thread' };
@@ -330,7 +338,7 @@ var Prefilter = (function () {
     return last;
   }
 
-  return { checkMessage: checkMessage, checkThread: checkThread };
+  return { checkMessage: checkMessage, checkThread: checkThread, isAgentThread: isAgentThread };
 })();
 
 // ---- core/Ics.js ----
@@ -2004,7 +2012,8 @@ function runSync_(mode) {
       ids = GmailApi.listThreads(token, 'newer_than:' + cfg.dryRunDays + 'd ' + GmailApi.SEARCH, null, cfg.dryRunMaxThreads).ids;
     } else {
       var inc = incrementalThreadIds_(acct, token, now);
-      ids = inc.ids;
+      // Recent brief emails are always re-checked, so any meeting they were mistaken for gets cleared.
+      ids = Util.uniq(inc.ids.concat(GmailApi.listThreads(token, 'from:("Founders Meeting Agent") newer_than:7d', null, 20).ids));
       patches[acct.email] = inc.patch;
     }
     var threads = GmailApi.getThreads(token, ids);
@@ -2123,6 +2132,10 @@ function planThread_(th, acct, meetings, cfg, now, updates, jobs) {
   var scope = Sources.threadScope(acct, th.id);
   var asOf = th.messages[th.messages.length - 1].date;
   var linked = meetings.some(function (m) { return m.obs.some(function (o) { return o.src === scope; }); });
+  if (Prefilter.isAgentThread(th)) {
+    if (linked) updates.push({ scope: scope, kind: 'email', asOf: asOf, obs: [] });
+    return false;
+  }
   var pf = Prefilter.checkThread(th);
   if (!pf.candidate && !linked) return false;
 
@@ -2364,7 +2377,7 @@ function sendMorningBrief() {
   var b = todayBrief_();
   if (b.brief.count) {
     CONFIG.founders.forEach(function (f) {
-      try { MailApp.sendEmail({ to: f.emails[0], subject: b.brief.title, body: b.brief.text, htmlBody: b.brief.html, name: 'Founders Meeting Agent' }); }
+      try { MailApp.sendEmail({ to: f.emails[0], subject: '☀ ' + b.brief.title, body: b.brief.text, htmlBody: b.brief.html, name: 'Founders Meeting Agent' }); }
       catch (e) { console.warn('Brief email to ' + f.name + ' failed: ' + e.message); }
     });
   }
@@ -2394,8 +2407,16 @@ function todayBrief_() {
 function putTodayItem_(t) {
   var tz = t.cfg.defaultTz, b = t.brief;
   var date = Util.isoInTz(t.day.start, tz).slice(0, 10);
-  var existing = (Calendar.Events.list(t.calId, { privateExtendedProperty: 'fm_brief=' + date, singleEvents: true, maxResults: 5 }).items || [])
-    .filter(function (e) { return e.status !== 'cancelled'; });
+  var find = function (key) {
+    return (Calendar.Events.list(t.calId, { privateExtendedProperty: 'fm_brief=' + key, singleEvents: true, maxResults: 5 }).items || [])
+      .filter(function (e) { return e.status !== 'cancelled'; });
+  };
+  // Older builds made a timed 7:10 event (keyed by the UTC date); replace it with the all-day item.
+  var oldKey = new Date(t.day.start).toISOString().slice(0, 10);
+  (oldKey === date ? [] : find(oldKey)).concat(find(date)).forEach(function (e) {
+    if (!e.start.date) Calendar.Events.remove(t.calId, e.id);
+  });
+  var existing = find(date).filter(function (e) { return e.start.date; });
   if (!b.count) {
     existing.forEach(function (e) { Calendar.Events.remove(t.calId, e.id); });
     return;
