@@ -74,6 +74,7 @@ function createWorld(now) {
     const q = Object.fromEntries(u.searchParams.entries());
     if (u.host === 'api.deepseek.com') {
       if (!opts.headers || opts.headers.Authorization !== 'Bearer ds-test') return json(401, { error: { message: 'Authentication Fails', type: 'authentication_error' } });
+      if (world.deepseekNoBalance) return json(402, { error: { message: 'Insufficient Balance', type: 'unknown_error' } });
       if (u.pathname === '/chat/completions') return json(200, deepseekCompletion(JSON.parse(opts.payload)));
     }
     if (u.host === 'api.anthropic.com') {

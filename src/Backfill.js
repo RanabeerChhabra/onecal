@@ -52,8 +52,15 @@ var Backfill = (function () {
   }
 
   // DeepSeek path: extract the page's candidates now instead of batching them.
+  // Returns false if the API itself failed (no credit, bad key, outage): the page is then redone next run.
   function extractNow(requests, acct, cfg, now, updates) {
     var resps = askModel_(requests.map(function (r) { return r.params; }), cfg);
+    var apiError = null;
+    resps.forEach(function (r) { if (!apiError && r && r.error) apiError = r.error; });
+    if (apiError) {
+      AgentLog.add({ action: 'error', who: acct.founder, reason: 'backfill paused, DeepSeek API error (will retry): ' + JSON.stringify(apiError).slice(0, 200) });
+      return false;
+    }
     requests.forEach(function (req, i) {
       var id = parseId(req.custom_id);
       var link = Sources.gmailLink(acct.email, id.threadId);
@@ -64,6 +71,7 @@ var Backfill = (function () {
       });
       updates.push({ scope: Sources.threadScope(acct, id.threadId), kind: 'email', asOf: id.asOf, obs: r.obs, keepIds: r.keepIds });
     });
+    return true;
   }
 
   function advance(acct, cfg, now, updates, patches, t0, budget) {
@@ -88,7 +96,7 @@ var Backfill = (function () {
         requests.push({ custom_id: customId(acct, th.id, asOf), params: Extract.buildRequest(th, acct, [], cfg, now) });
       });
       if (requests.length && direct) {
-        extractNow(requests, acct, cfg, now, updates);
+        if (!extractNow(requests, acct, cfg, now, updates)) break;
       } else if (requests.length) {
         var batch = Claude.createBatch(requests, cfg.raw.ANTHROPIC_API_KEY);
         var list = pending();

@@ -66,3 +66,21 @@ test('deepseek end to end: backfill extracts right away (no batches) and retries
   const titles = world.sharedEvents().map((e) => e.summary);
   assert.ok(titles.some((t) => t.includes('Priya')), titles.join(' | ') + '\n' + copy.logs.join('\n'));
 });
+
+test('deepseek out of credit: backfill pauses on that page and picks it up after a top-up', () => {
+  const AMP = 'founders@tryamp.in';
+  const world = createWorld(() => Date.parse('2026-10-26T10:00:00+05:30'));
+  const copy = world.account(AMP);
+  copy.props.DEEPSEEK_API_KEY = 'ds-test';
+  const f = JSON.parse(JSON.stringify(fixture('confirmed.json')).split('ranabeer.personal@gmail.com').join(AMP));
+  world.deliver(AMP, f.threadId, f.messages, false); // old mail: only the backfill finds it
+  world.replyWhenPromptContains(f.messages[f.messages.length - 1].body.slice(0, 40), f.mockReply);
+  copy.ctx.setup();
+  world.deepseekNoBalance = true;
+  copy.ctx.syncAll();
+  assert.strictEqual(world.sharedEvents().length, 0);
+  assert.ok(copy.logs.some((l) => /backfill paused.*Insufficient Balance/.test(l)), copy.logs.join('\n'));
+  world.deepseekNoBalance = false;
+  copy.ctx.syncAll();
+  assert.ok(world.sharedEvents().some((e) => e.summary.includes('Priya')), copy.logs.join('\n'));
+});
