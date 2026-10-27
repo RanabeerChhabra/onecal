@@ -1,0 +1,36 @@
+{
+  "description": "The confirmed Sequoia call gets moved to Friday 11am in the same thread",
+  "threadId": "18f0a1confirm01",
+  "account": { "email": "ranabeer.personal@gmail.com", "founder": "R" },
+  "messages": [
+    {
+      "from": "Priya Raman <priya@sequoia.example>",
+      "to": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "subject": "Re: Intro call: Sociops x Sequoia",
+      "date": "2026-10-26T09:02:00+05:30",
+      "body": "Thursday 4pm IST works. See you then!\n\nZoom: https://us02web.zoom.us/j/81234567890?pwd=abc123\n\nPriya"
+    },
+    {
+      "from": "Priya Raman <priya@sequoia.example>",
+      "to": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "subject": "Re: Intro call: Sociops x Sequoia",
+      "date": "2026-10-27T13:15:00+05:30",
+      "body": "Hi Ranabeer, something came up on Thursday. Could we move our call to Friday the 30th at 11am instead? Same Zoom link."
+    },
+    {
+      "from": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "to": "Priya Raman <priya@sequoia.example>",
+      "subject": "Re: Intro call: Sociops x Sequoia",
+      "date": "2026-10-27T13:40:00+05:30",
+      "body": "No problem, Friday 11am works. Talk then."
+    }
+  ],
+  "expected": { "prefilter": true, "meetings": [{ "status": "confirmed", "start": "2026-10-30T11:00:00+05:30" }] },
+  "mockReply": { "meetings": [{
+    "known_id": "__KNOWN__", "status": "confirmed", "title": "Intro call with Priya (Sequoia)",
+    "with": ["Priya Raman (Sequoia)"], "attendee_emails": ["priya@sequoia.example", "ranabeer.personal@gmail.com"],
+    "start": "2026-10-30T11:00:00+05:30", "end": null, "timezone": "Asia/Kolkata",
+    "location": null, "join_url": "https://us02web.zoom.us/j/81234567890?pwd=abc123",
+    "confidence": 0.93, "evidence": "No problem, Friday 11am works."
+  }]}
+}

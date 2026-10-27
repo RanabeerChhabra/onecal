@@ -1,0 +1,174 @@
+{
+  "description": "One investor invite sent to Ranabeer's university account and Hardik's personal account: arrives as an invite email in both inboxes and as an event on both calendars",
+  "ics": "BEGIN:VCALENDAR\r\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\r\nVERSION:2.0\r\nMETHOD:REQUEST\r\nBEGIN:VTIMEZONE\r\nTZID:Asia/Kolkata\r\nBEGIN:STANDARD\r\nTZOFFSETFROM:+0530\r\nTZOFFSETTO:+0530\r\nDTSTART:19700101T000000\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\nBEGIN:VEVENT\r\nDTSTART;TZID=Asia/Kolkata:20261102T143000\r\nDTEND;TZID=Asia/Kolkata:20261102T153000\r\nUID:5q8v2kq0abcd1234@google.com\r\nORGANIZER;CN=Meera Iyer:mailto:meera@fundx.example\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=ranabeer@uni.example.edu;X-NUM-GUESTS=0:mailto:ranabeer@uni.example.edu\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Hardik:mailto:hardik.personal@gmail.com\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Meera Iyer:mailto:meera@fundx.example\r\nX-GOOGLE-CONFERENCE:https://meet.google.com/xyz-abcd-efg\r\nSEQUENCE:0\r\nSTATUS:CONFIRMED\r\nSUMMARY:FundX <> Sociops partner meeting\r\nDESCRIPTION:Agenda: traction\\, round plans.\\nJoin with Google Meet: https://meet.google\r\n .com/xyz-abcd-efg\r\nLOCATION:\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nTRIGGER:-P0DT0H30M0S\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+  "emails": [
+    {
+      "threadId": "18f0a1invR00001",
+      "account": {
+        "email": "ranabeer@uni.example.edu",
+        "founder": "R"
+      },
+      "messages": [
+        {
+          "from": "Meera Iyer <meera@fundx.example>",
+          "to": "ranabeer@uni.example.edu",
+          "subject": "Invitation: FundX <> Sociops partner meeting @ Mon 2 Nov 2026 2:30pm - 3:30pm (IST)",
+          "date": "2026-10-24T15:30:00+05:30",
+          "body": "You have been invited to the following event.",
+          "icsTexts": [
+            "BEGIN:VCALENDAR\r\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\r\nVERSION:2.0\r\nMETHOD:REQUEST\r\nBEGIN:VTIMEZONE\r\nTZID:Asia/Kolkata\r\nBEGIN:STANDARD\r\nTZOFFSETFROM:+0530\r\nTZOFFSETTO:+0530\r\nDTSTART:19700101T000000\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\nBEGIN:VEVENT\r\nDTSTART;TZID=Asia/Kolkata:20261102T143000\r\nDTEND;TZID=Asia/Kolkata:20261102T153000\r\nUID:5q8v2kq0abcd1234@google.com\r\nORGANIZER;CN=Meera Iyer:mailto:meera@fundx.example\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=ranabeer@uni.example.edu;X-NUM-GUESTS=0:mailto:ranabeer@uni.example.edu\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Hardik:mailto:hardik.personal@gmail.com\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Meera Iyer:mailto:meera@fundx.example\r\nX-GOOGLE-CONFERENCE:https://meet.google.com/xyz-abcd-efg\r\nSEQUENCE:0\r\nSTATUS:CONFIRMED\r\nSUMMARY:FundX <> Sociops partner meeting\r\nDESCRIPTION:Agenda: traction\\, round plans.\\nJoin with Google Meet: https://meet.google\r\n .com/xyz-abcd-efg\r\nLOCATION:\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nTRIGGER:-P0DT0H30M0S\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+          ]
+        }
+      ]
+    },
+    {
+      "threadId": "18f0a1invH00001",
+      "account": {
+        "email": "hardik.personal@gmail.com",
+        "founder": "H"
+      },
+      "messages": [
+        {
+          "from": "Meera Iyer <meera@fundx.example>",
+          "to": "hardik.personal@gmail.com",
+          "subject": "Invitation: FundX <> Sociops partner meeting @ Mon 2 Nov 2026 2:30pm - 3:30pm (IST)",
+          "date": "2026-10-24T15:30:00+05:30",
+          "body": "You have been invited to the following event.",
+          "icsTexts": [
+            "BEGIN:VCALENDAR\r\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\r\nVERSION:2.0\r\nMETHOD:REQUEST\r\nBEGIN:VTIMEZONE\r\nTZID:Asia/Kolkata\r\nBEGIN:STANDARD\r\nTZOFFSETFROM:+0530\r\nTZOFFSETTO:+0530\r\nDTSTART:19700101T000000\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\nBEGIN:VEVENT\r\nDTSTART;TZID=Asia/Kolkata:20261102T143000\r\nDTEND;TZID=Asia/Kolkata:20261102T153000\r\nUID:5q8v2kq0abcd1234@google.com\r\nORGANIZER;CN=Meera Iyer:mailto:meera@fundx.example\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=ranabeer@uni.example.edu;X-NUM-GUESTS=0:mailto:ranabeer@uni.example.edu\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Hardik:mailto:hardik.personal@gmail.com\r\nATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Meera Iyer:mailto:meera@fundx.example\r\nX-GOOGLE-CONFERENCE:https://meet.google.com/xyz-abcd-efg\r\nSEQUENCE:0\r\nSTATUS:CONFIRMED\r\nSUMMARY:FundX <> Sociops partner meeting\r\nDESCRIPTION:Agenda: traction\\, round plans.\\nJoin with Google Meet: https://meet.google\r\n .com/xyz-abcd-efg\r\nLOCATION:\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nTRIGGER:-P0DT0H30M0S\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+          ]
+        }
+      ]
+    }
+  ],
+  "calendarEvents": {
+    "ranabeer@uni.example.edu": [
+      {
+        "kind": "calendar#event",
+        "id": "5q8v2kq0abcd1234",
+        "status": "confirmed",
+        "htmlLink": "https://www.google.com/calendar/event?eid=NXE4djJr&ctz=Asia/Kolkata&authuser=ranabeer@uni.example.edu",
+        "updated": "2026-10-24T10:00:00.000Z",
+        "summary": "FundX <> Sociops partner meeting",
+        "organizer": {
+          "email": "meera@fundx.example",
+          "displayName": "Meera Iyer"
+        },
+        "start": {
+          "dateTime": "2026-11-02T14:30:00+05:30",
+          "timeZone": "Asia/Kolkata"
+        },
+        "end": {
+          "dateTime": "2026-11-02T15:30:00+05:30",
+          "timeZone": "Asia/Kolkata"
+        },
+        "iCalUID": "5q8v2kq0abcd1234@google.com",
+        "sequence": 0,
+        "attendees": [
+          {
+            "email": "ranabeer@uni.example.edu",
+            "responseStatus": "needsAction",
+            "self": true
+          },
+          {
+            "email": "hardik.personal@gmail.com",
+            "responseStatus": "accepted",
+            "self": false
+          },
+          {
+            "email": "meera@fundx.example",
+            "displayName": "Meera Iyer",
+            "responseStatus": "accepted",
+            "organizer": true
+          }
+        ],
+        "hangoutLink": "https://meet.google.com/xyz-abcd-efg",
+        "eventType": "default"
+      }
+    ],
+    "hardik.personal@gmail.com": [
+      {
+        "kind": "calendar#event",
+        "id": "5q8v2kq0abcd1234",
+        "status": "confirmed",
+        "htmlLink": "https://www.google.com/calendar/event?eid=NXE4djJr&ctz=Asia/Kolkata&authuser=hardik.personal@gmail.com",
+        "updated": "2026-10-24T10:00:00.000Z",
+        "summary": "FundX <> Sociops partner meeting",
+        "organizer": {
+          "email": "meera@fundx.example",
+          "displayName": "Meera Iyer"
+        },
+        "start": {
+          "dateTime": "2026-11-02T14:30:00+05:30",
+          "timeZone": "Asia/Kolkata"
+        },
+        "end": {
+          "dateTime": "2026-11-02T15:30:00+05:30",
+          "timeZone": "Asia/Kolkata"
+        },
+        "iCalUID": "5q8v2kq0abcd1234@google.com",
+        "sequence": 0,
+        "attendees": [
+          {
+            "email": "ranabeer@uni.example.edu",
+            "responseStatus": "needsAction",
+            "self": false
+          },
+          {
+            "email": "hardik.personal@gmail.com",
+            "responseStatus": "accepted",
+            "self": true
+          },
+          {
+            "email": "meera@fundx.example",
+            "displayName": "Meera Iyer",
+            "responseStatus": "accepted",
+            "organizer": true
+          }
+        ],
+        "hangoutLink": "https://meet.google.com/xyz-abcd-efg",
+        "eventType": "default"
+      }
+    ]
+  },
+  "followUpEmail": {
+    "threadId": "18f0a1invF00001",
+    "account": {
+      "email": "ranabeer.personal@gmail.com",
+      "founder": "R"
+    },
+    "messages": [
+      {
+        "from": "Meera Iyer <meera@fundx.example>",
+        "to": "ranabeer.personal@gmail.com",
+        "subject": "Looking forward to Monday",
+        "date": "2026-10-25T12:00:00+05:30",
+        "body": "Hi Ranabeer, confirming our partner meeting Monday 2 Nov at 2:30pm IST with you and Hardik. Meet link is in the invite."
+      }
+    ]
+  },
+  "followUpMockReply": {
+    "meetings": [
+      {
+        "known_id": null,
+        "status": "confirmed",
+        "title": "Partner meeting with Meera (FundX)",
+        "with": [
+          "Meera Iyer (FundX)"
+        ],
+        "attendee_emails": [
+          "meera@fundx.example",
+          "ranabeer.personal@gmail.com",
+          "hardik.personal@gmail.com"
+        ],
+        "start": "2026-11-02T14:30:00+05:30",
+        "end": null,
+        "timezone": "Asia/Kolkata",
+        "location": null,
+        "join_url": null,
+        "confidence": 0.92,
+        "evidence": "confirming our partner meeting Monday 2 Nov at 2:30pm IST"
+      }
+    ]
+  }
+}

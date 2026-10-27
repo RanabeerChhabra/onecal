@@ -1,0 +1,29 @@
+{
+  "description": "Meeting agreed in plain text, with a Zoom link",
+  "threadId": "18f0a1confirm01",
+  "account": { "email": "ranabeer.personal@gmail.com", "founder": "R" },
+  "messages": [
+    {
+      "from": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "to": "Priya Raman <priya@sequoia.example>",
+      "subject": "Intro call: Sociops x Sequoia",
+      "date": "2026-10-24T18:10:00+05:30",
+      "body": "Hi Priya,\n\nGreat to e-meet. Would Thursday 4pm IST work for a 30 min intro call?\n\nBest,\nRanabeer"
+    },
+    {
+      "from": "Priya Raman <priya@sequoia.example>",
+      "to": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "subject": "Re: Intro call: Sociops x Sequoia",
+      "date": "2026-10-26T09:02:00+05:30",
+      "body": "Thursday 4pm IST works. See you then!\n\nZoom: https://us02web.zoom.us/j/81234567890?pwd=abc123\n\nPriya\n\nOn Sat, Oct 24, 2026 at 6:10 PM Ranabeer Chhabra <ranabeer.personal@gmail.com> wrote:\n> Hi Priya,\n> Would Thursday 4pm IST work?"
+    }
+  ],
+  "expected": { "prefilter": true, "meetings": [{ "status": "confirmed", "start": "2026-10-29T16:00:00+05:30" }] },
+  "mockReply": { "meetings": [{
+    "known_id": null, "status": "confirmed", "title": "Intro call with Priya (Sequoia)",
+    "with": ["Priya Raman (Sequoia)"], "attendee_emails": ["priya@sequoia.example", "ranabeer.personal@gmail.com"],
+    "start": "2026-10-29T16:00:00+05:30", "end": "2026-10-29T16:30:00+05:30", "timezone": "Asia/Kolkata",
+    "location": null, "join_url": "https://us02web.zoom.us/j/81234567890?pwd=abc123",
+    "confidence": 0.95, "evidence": "Thursday 4pm IST works. See you then!"
+  }]}
+}

@@ -1,0 +1,23 @@
+{
+  "description": "Calendly booking confirmation",
+  "threadId": "18f0a1calendly1",
+  "account": { "email": "anshul.personal@gmail.com", "founder": "A" },
+  "messages": [
+    {
+      "from": "Calendly <notifications@calendly.com>",
+      "to": "anshul.personal@gmail.com",
+      "subject": "New Event: Neha Kapoor - 03:00pm Wed, Nov 4, 2026 - 30 Minute Meeting",
+      "date": "2026-10-25T20:12:00+05:30",
+      "listUnsubscribe": "<https://calendly.com/unsubscribe>",
+      "body": "Hi Anshul,\n\nA new event has been scheduled.\n\nEvent Type: 30 Minute Meeting\nInvitee: Neha Kapoor\nInvitee Email: neha@foodbrand.example\nEvent Date/Time: 03:00pm - 03:30pm, Wednesday, November 4, 2026 (India Standard Time)\nLocation: https://us06web.zoom.us/j/99887766554"
+    }
+  ],
+  "expected": { "prefilter": true, "meetings": [{ "status": "confirmed", "start": "2026-11-04T15:00:00+05:30" }] },
+  "mockReply": { "meetings": [{
+    "known_id": null, "status": "confirmed", "title": "30 min meeting with Neha Kapoor",
+    "with": ["Neha Kapoor"], "attendee_emails": ["neha@foodbrand.example", "anshul.personal@gmail.com"],
+    "start": "2026-11-04T15:00:00+05:30", "end": "2026-11-04T15:30:00+05:30", "timezone": "Asia/Kolkata",
+    "location": null, "join_url": "https://us06web.zoom.us/j/99887766554",
+    "confidence": 0.98, "evidence": "03:00pm - 03:30pm, Wednesday, November 4, 2026 (India Standard Time)"
+  }]}
+}

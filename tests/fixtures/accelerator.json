@@ -1,0 +1,23 @@
+{
+  "description": "Accelerator slot confirmed with a relative date ('28th') and explicit IST",
+  "threadId": "18f0a1accel0001",
+  "account": { "email": "anshul.personal@gmail.com", "founder": "A" },
+  "messages": [
+    {
+      "from": "Programs Team <programs@accelerator.example>",
+      "to": "anshul.personal@gmail.com",
+      "cc": "hardik@sociops.example",
+      "subject": "Sociops: interview slot confirmed",
+      "date": "2026-10-22T15:00:00+05:30",
+      "body": "Dear Anshul,\n\nThank you for applying. Your partner interview is confirmed for the 28th, 11am IST (45 minutes). Both founders listed on the application (you and Hardik) should join.\n\nGoogle Meet: https://meet.google.com/abc-defg-hij\n\nRegards,\nPrograms Team"
+    }
+  ],
+  "expected": { "prefilter": true, "meetings": [{ "status": "confirmed", "start": "2026-10-28T11:00:00+05:30" }] },
+  "mockReply": { "meetings": [{
+    "known_id": null, "status": "confirmed", "title": "Accelerator partner interview",
+    "with": ["Programs Team (Accelerator)"], "attendee_emails": ["anshul.personal@gmail.com", "hardik@sociops.example"],
+    "start": "2026-10-28T11:00:00+05:30", "end": "2026-10-28T11:45:00+05:30", "timezone": "Asia/Kolkata",
+    "location": null, "join_url": "https://meet.google.com/abc-defg-hij",
+    "confidence": 0.97, "evidence": "Your partner interview is confirmed for the 28th, 11am IST"
+  }]}
+}

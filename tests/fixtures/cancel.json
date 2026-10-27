@@ -1,0 +1,29 @@
+{
+  "description": "The Sequoia call is cancelled",
+  "threadId": "18f0a1confirm01",
+  "account": { "email": "ranabeer.personal@gmail.com", "founder": "R" },
+  "messages": [
+    {
+      "from": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "to": "Priya Raman <priya@sequoia.example>",
+      "subject": "Re: Intro call: Sociops x Sequoia",
+      "date": "2026-10-27T13:40:00+05:30",
+      "body": "No problem, Friday 11am works. Talk then."
+    },
+    {
+      "from": "Priya Raman <priya@sequoia.example>",
+      "to": "Ranabeer Chhabra <ranabeer.personal@gmail.com>",
+      "subject": "Re: Intro call: Sociops x Sequoia",
+      "date": "2026-10-29T19:05:00+05:30",
+      "body": "Really sorry Ranabeer, I have to cancel our call tomorrow; I'm travelling unexpectedly. I'll reach out in a couple of weeks to find a new time."
+    }
+  ],
+  "expected": { "prefilter": true, "meetings": [{ "status": "cancelled", "start": "2026-10-30T11:00:00+05:30" }] },
+  "mockReply": { "meetings": [{
+    "known_id": "__KNOWN__", "status": "cancelled", "title": "Intro call with Priya (Sequoia)",
+    "with": ["Priya Raman (Sequoia)"], "attendee_emails": ["priya@sequoia.example"],
+    "start": "2026-10-30T11:00:00+05:30", "end": null, "timezone": "Asia/Kolkata",
+    "location": null, "join_url": null,
+    "confidence": 0.96, "evidence": "I have to cancel our call tomorrow"
+  }]}
+}

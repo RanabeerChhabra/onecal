@@ -1,0 +1,16 @@
+{
+  "description": "Vague proposal with no agreed time",
+  "threadId": "18f0a1vague0001",
+  "account": { "email": "hardik.personal@gmail.com", "founder": "H" },
+  "messages": [
+    {
+      "from": "Arjun Mehta <arjun@brandco.example>",
+      "to": "Hardik <hardik.personal@gmail.com>",
+      "subject": "Catching up",
+      "date": "2026-10-25T11:30:00+05:30",
+      "body": "Hey Hardik, would love to catch up sometime next week about the campaign. Maybe Tuesday or Wednesday afternoon? Let me know what works and I'll send an invite."
+    }
+  ],
+  "expected": { "prefilter": true, "meetings": [] },
+  "mockReply": { "meetings": [] }
+}

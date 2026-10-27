@@ -1,0 +1,14 @@
+{
+  "name": "founders-meetings",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Scans every founder's Gmail + Calendar for meetings and keeps one shared Google Calendar up to date.",
+  "scripts": {
+    "bundle": "node scripts/bundle.js",
+    "test": "node scripts/bundle.js && node --test tests/",
+    "eval:live": "node scripts/eval-live.mjs"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^1.3.0"
+  }
+}

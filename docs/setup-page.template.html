@@ -1,0 +1,264 @@
+<title>Meeting Agent Setup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a calendar-event "preview" strip up top, then the install checklist in order. */
+:root {
+  --bg: #f5f7f8; --surface: #ffffff; --ink: #172026; --muted: #5b6770; --line: #dde3e7;
+  --accent: #0d6b62; --accent-ink: #ffffff; --accent-soft: #e3f2ef;
+  --tag-r: #3b5bdb; --tag-h: #c2410c; --tag-a: #7c3aed; --tag-team: #0d6b62;
+  --warn-bg: #fff7e6; --warn-ink: #7a4b00; --code-bg: #eef2f4;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1417; --surface: #172026; --ink: #e8eef1; --muted: #9aa8b1; --line: #2a353c;
+  --accent: #4fc2b5; --accent-ink: #062b27; --accent-soft: #15302d;
+  --tag-r: #8ea6ff; --tag-h: #fb9a6b; --tag-a: #c4a5ff; --tag-team: #4fc2b5;
+  --warn-bg: #2d2412; --warn-ink: #f5cf8a; --code-bg: #1d282f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1417; --surface: #172026; --ink: #e8eef1; --muted: #9aa8b1; --line: #2a353c;
+  --accent: #4fc2b5; --accent-ink: #062b27; --accent-soft: #15302d;
+  --tag-r: #8ea6ff; --tag-h: #fb9a6b; --tag-a: #c4a5ff; --tag-team: #4fc2b5;
+  --warn-bg: #2d2412; --warn-ink: #f5cf8a; --code-bg: #1d282f; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 36px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 6vw, 42px); }
+h2 { font-size: 22px; }
+p { margin: 0; max-width: 65ch; }
+.lede { color: var(--muted); font-size: 17px; margin-top: 10px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+section { display: grid; gap: 14px; }
+
+/* calendar preview */
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; }
+.day-head { font: 500 12px/1 var(--mono); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.ev { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: baseline; padding: 8px 10px; border-radius: 8px; background: var(--code-bg); }
+.ev time { font: 400 13px/1.3 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.ev span { min-width: 0; font-weight: 500; }
+.tag { font-family: var(--mono); font-weight: 500; font-size: 13px; margin-right: 6px; }
+.t-r { color: var(--tag-r); } .t-h { color: var(--tag-h); } .t-a { color: var(--tag-a); } .t-team { color: var(--tag-team); }
+
+/* who installs what */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td.addr { font-family: var(--mono); font-size: 13px; word-break: break-all; }
+.owner { font: 600 11px/1 var(--body); background: var(--accent-soft); color: var(--accent); padding: 3px 7px; border-radius: 999px; margin-left: 6px; white-space: nowrap; }
+
+/* steps */
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 12px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+ol.steps > li::before { content: counter(s); font: 600 15px/34px var(--display); width: 34px; height: 34px; text-align: center;
+  border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+ol.steps > li > div { min-width: 0; display: grid; gap: 6px; }
+.who { font: 500 12px/1 var(--mono); color: var(--muted); letter-spacing: .04em; }
+.step-title { font-weight: 600; }
+.sub { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.done-toggle { justify-self: start; display: inline-flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); cursor: pointer; }
+.done-toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+li.is-done { opacity: .6; }
+code, .k { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* copy blocks */
+.copy-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button.copy { font: 600 14px/1 var(--body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: 11px 14px; cursor: pointer; }
+button.copy.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.copied { font-size: 14px; color: var(--accent); min-height: 1em; }
+textarea.src { width: 100%; box-sizing: border-box; height: 140px; font: 12px/1.4 var(--mono); background: var(--code-bg); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+
+.note { background: var(--warn-bg); color: var(--warn-ink); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; }
+.note strong { color: inherit; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; }
+.panel h3 { margin: 0; font: 600 16px/1.3 var(--body); }
+.panel ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+footer { color: var(--muted); font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: transform .08s; } button.copy:active { transform: scale(.98); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Ranabeer · Hardik · Anshul</div>
+    <h1>Set up the meeting agent</h1>
+    <p class="lede">One shared Google Calendar with every meeting from all five of our inboxes, tagged by whose it is. Each account needs a small script installed once, which takes about 5 minutes.</p>
+  </header>
+
+  <section aria-label="What the calendar will look like">
+    <div class="day">
+      <div class="day-head">Founders — All Meetings · Mon 2 Nov</div>
+      <div class="ev"><time>11:00</time><span><span class="tag t-r">[R]</span>Intro call with Priya (Sequoia)</span></div>
+      <div class="ev"><time>14:30</time><span><span class="tag t-r">[R+H]</span>FundX partner meeting</span></div>
+      <div class="ev"><time>16:00</time><span><span class="tag t-team">[R+H+A]</span>Demo with Acme (from founders@)</span></div>
+      <div class="ev"><time>18:00</time><span><span class="tag t-a">[A]</span>(?) Catch-up with Neha</span></div>
+    </div>
+    <p class="lede" style="margin-top:0">Example events. <code>(?)</code> means the meeting was found only in email text and isn't certain.</p>
+  </section>
+
+  <section>
+    <h2>Who installs which account</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Account</th><th>Installed by</th><th>Tag</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">founders@tryamp.in<span class="owner">install first</span></td><td>Anshul</td><td><span class="tag t-team">[R+H+A]</span></td></tr>
+        <tr><td class="addr">team@brand.example</td><td>Anshul</td><td><span class="tag t-team">[R+H+A]</span></td></tr>
+        <tr><td class="addr">anshul@school.example</td><td>Anshul</td><td><span class="tag t-a">[A]</span></td></tr>
+        <tr><td class="addr">hardik@school.example</td><td>Hardik</td><td><span class="tag t-h">[H]</span></td></tr>
+        <tr><td class="addr">ranabeer@school.example</td><td>Ranabeer</td><td><span class="tag t-r">[R]</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Do these in order</h2>
+    <ol class="steps">
+      <li id="s1"><div>
+        <div class="who">RANABEER · 5 MIN</div>
+        <div class="step-title">Get the DeepSeek API key</div>
+        <p>At <a href="https://platform.deepseek.com" target="_blank" rel="noopener">platform.deepseek.com</a>, sign up, go to <b>Top up</b> and add $5, which covers the first scan and months after. Then go to <b>API keys → Create new API key</b> and copy it (it's only shown once). Send the key privately to Hardik and Anshul. Everyone uses the same key.</p>
+        <label class="done-toggle"><input type="checkbox" id="d1"> Done</label>
+      </div></li>
+      <li id="s2"><div>
+        <div class="who">ANSHUL · 2 MIN · TRYAMP.IN ADMIN</div>
+        <div class="step-title">Let outside accounts edit tryamp.in calendars</div>
+        <p><a href="https://admin.google.com" target="_blank" rel="noopener">admin.google.com</a> → Apps → Google Workspace → Calendar → Sharing settings → <b>External sharing options for secondary calendars</b> → <b>Share all information, and outsiders can change calendars</b> → Save.</p>
+        <p class="who" style="letter-spacing:0">This lets the Ashoka and brevity accounts write meetings into the shared calendar.</p>
+        <label class="done-toggle"><input type="checkbox" id="d2"> Done</label>
+      </div></li>
+      <li id="s3"><div>
+        <div class="who">ANSHUL · 5 MIN</div>
+        <div class="step-title">Install in founders@tryamp.in</div>
+        <p>Follow <a href="#install">Install in one account</a> below. Its setup creates the calendar and shares it with the other four accounts.</p>
+        <label class="done-toggle"><input type="checkbox" id="d3"> Done</label>
+      </div></li>
+      <li id="s4"><div>
+        <div class="who">EVERYONE · 5 MIN PER ACCOUNT</div>
+        <div class="step-title">Accept the share, then install in the other four</div>
+        <p>In each remaining account, open the email <b>"Founders — All Meetings has been shared with you"</b> and click <b>Add this calendar</b>. Then follow <a href="#install">Install in one account</a>.</p>
+        <ul class="sub">
+          <li>Anshul: team@brand.example and his Ashoka account</li>
+          <li>Hardik: his Ashoka account</li>
+          <li>Ranabeer: his Ashoka account</li>
+        </ul>
+        <label class="done-toggle"><input type="checkbox" id="d4"> Done</label>
+      </div></li>
+      <li id="s5"><div>
+        <div class="who">EVERYONE · 3 MIN</div>
+        <div class="step-title">Turn on reminders and the widget on your phone</div>
+        <p>See <a href="#phone">Phone</a> below.</p>
+        <label class="done-toggle"><input type="checkbox" id="d5"> Done</label>
+      </div></li>
+    </ol>
+  </section>
+
+  <section id="install">
+    <h2>Install in one account</h2>
+    <div class="note"><strong>Use a window with only that account signed in</strong>, such as a separate Chrome profile or an incognito window. Apps Script breaks when several Google accounts are signed in at once.</div>
+    <ol class="steps">
+      <li><div>
+        <div class="step-title">Create the project</div>
+        <p>Open <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → <b>New project</b>. Click "Untitled project" and rename it <b>Founders Meeting Agent</b>.</p>
+      </div></li>
+      <li><div>
+        <div class="step-title">Show the settings file</div>
+        <p>⚙ <b>Project Settings</b> → tick <b>Show "appsscript.json" manifest file in editor</b>.</p>
+      </div></li>
+      <li><div>
+        <div class="step-title">Paste the two files</div>
+        <p>Back in ‹› <b>Editor</b>, open <code>appsscript.json</code>, select all, and paste:</p>
+        <div class="copy-row"><button class="copy secondary" type="button" data-src="manifest" id="btn-manifest">Copy appsscript.json</button><span class="copied" id="ok-manifest" aria-live="polite"></span></div>
+        <textarea class="src" id="manifest" readonly hidden aria-label="appsscript.json">__MANIFEST__</textarea>
+        <p>Then open <code>Code.gs</code>, select all, and paste:</p>
+        <div class="copy-row"><button class="copy" type="button" data-src="code" id="btn-code">Copy Code.gs</button><span class="copied" id="ok-code" aria-live="polite"></span></div>
+        <textarea class="src" id="code" readonly hidden aria-label="Code.gs">__CODE__</textarea>
+        <p>Press <b>⌘S</b> (Mac) or <b>Ctrl+S</b> (Windows) to save.</p>
+      </div></li>
+      <li><div>
+        <div class="step-title">Add the API key</div>
+        <p>⚙ <b>Project Settings</b> → <b>Script properties</b> → <b>Add script property</b>. Property: <code>DEEPSEEK_API_KEY</code>, value: the key from Ranabeer. Save.</p>
+      </div></li>
+      <li><div>
+        <div class="step-title">Run setup</div>
+        <p>‹› Editor → function dropdown in the toolbar → <b>setup</b> → <b>Run</b> → <b>Review permissions</b> → pick the account. If it says <i>"Google hasn't verified this app"</i>, click <b>Advanced → Go to Founders Meeting Agent (unsafe)</b>. It's our own script. Then click <b>Allow</b>.</p>
+        <p>The log at the bottom should say <b>✅ Setup done</b>.</p>
+      </div></li>
+      <li><div>
+        <div class="step-title">Preview, then switch on</div>
+        <p>Pick <b>dryRun</b> → Run. The log lists what it would add, and nothing is written yet. If it looks right, pick <b>enableSync</b> → Run. From then on it checks every 10 minutes, and older meetings from the last 6 months fill in over the next hour or two.</p>
+      </div></li>
+    </ol>
+  </section>
+
+  <section id="phone">
+    <h2>Phone</h2>
+    <p>No app to install beyond Google Calendar. First, on a computer: <a href="https://calendar.google.com" target="_blank" rel="noopener">calendar.google.com</a> → hover <b>Founders — All Meetings</b> → ⋮ → <b>Settings and sharing</b> → <b>Event notifications</b> → add <b>30 minutes</b> and <b>10 minutes</b>.</p>
+    <div class="grid2">
+      <div class="panel"><h3>iPhone</h3><ol>
+        <li>Install <b>Google Calendar</b> and sign in with your Ashoka account.</li>
+        <li>☰ → tick <b>Founders — All Meetings</b>.</li>
+        <li>iOS Settings → Notifications → Google Calendar → Allow.</li>
+        <li>Long-press the home screen → <b>+</b> → Google Calendar → <b>Up next</b> → Add Widget.</li>
+      </ol></div>
+      <div class="panel"><h3>Android</h3><ol>
+        <li>Google Calendar → ☰ → tick <b>Founders — All Meetings</b>. If it's missing: Settings → the calendar → Sync on.</li>
+        <li>Settings → the calendar → <b>Default notifications</b>: 30 and 10 min.</li>
+        <li>Long-press the home screen → Widgets → Calendar → <b>Schedule</b>.</li>
+      </ol></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>If something goes wrong</h2>
+    <div class="grid2">
+      <div class="panel"><h3>"This app is blocked"</h3><p>Ashoka doesn't let the script read Gmail. Tell Ranabeer; there's a ready-made email to Ashoka IT. The other accounts keep working in the meantime.</p></div>
+      <div class="panel"><h3>"Could not find the calendar"</h3><p>Open the share email in that account and click <b>Add this calendar</b>, then run setup again. If no email came, check that step 2 was done.</p></div>
+      <div class="panel"><h3>"can only view the shared calendar"</h3><p>Step 2 isn't done yet. Once it is, Anshul runs <b>setup</b> again in founders@tryamp.in.</p></div>
+      <div class="panel"><h3>Want to stop one account?</h3><p>In that account's script, run <b>removeThisAccount</b>. It stops syncing and removes upcoming meetings only that account knew about.</p></div>
+    </div>
+  </section>
+
+  <footer>Code build __VERSION__. The decision log for each account is in that account's Google Drive: "Founders Meeting Agent — Log".</footer>
+</div>
+
+<script>
+(function () {
+  document.querySelectorAll('button.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-src');
+      var ta = document.getElementById(id);
+      var ok = document.getElementById('ok-' + id);
+      var text = ta.value;
+      var fallback = function () {
+        ta.hidden = false; ta.focus(); ta.select();
+        ok.textContent = 'Selected. Press ⌘C / Ctrl+C to copy.';
+      };
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          ok.textContent = 'Copied (' + Math.round(text.length / 1024) + ' KB). Paste it into the editor.';
+        }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+  // Ticked steps are remembered in this browser only.
+  for (var i = 1; i <= 5; i++) (function (n) {
+    var box = document.getElementById('d' + n), li = document.getElementById('s' + n);
+    try { if (localStorage.getItem('fm-step-' + n) === '1') { box.checked = true; li.classList.add('is-done'); } } catch (e) {}
+    box.addEventListener('change', function () {
+      li.classList.toggle('is-done', box.checked);
+      try { localStorage.setItem('fm-step-' + n, box.checked ? '1' : '0'); } catch (e) {}
+    });
+  })(i);
+})();
+</script>

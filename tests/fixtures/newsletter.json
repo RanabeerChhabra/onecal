@@ -1,0 +1,18 @@
+{
+  "description": "Webinar promotion that mentions a date and time",
+  "threadId": "18f0a1newslet01",
+  "account": { "email": "ranabeer.personal@gmail.com", "founder": "R" },
+  "messages": [
+    {
+      "from": "Growth Weekly <hello@growthweekly.example>",
+      "to": "ranabeer.personal@gmail.com",
+      "subject": "Live webinar Thursday 6pm: scaling your agency",
+      "date": "2026-10-25T08:00:00+05:30",
+      "labels": ["CATEGORY_UPDATES"],
+      "listUnsubscribe": "<mailto:unsub@growthweekly.example>",
+      "body": "Join our live session this Thursday at 6pm IST. Save your seat! Register now."
+    }
+  ],
+  "expected": { "prefilter": false, "meetings": [] },
+  "mockReply": { "meetings": [] }
+}
