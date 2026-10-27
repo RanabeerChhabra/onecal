@@ -141,7 +141,15 @@ function createWorld(now) {
       } },
       CalendarList: {
         list: () => ({ items: (world.calendarLists[email] || []).map((id) => ({ id, summary: world.calendars[id].meta.summary, accessRole: cal(id).role })) }),
-        get: (id) => ({ id, accessRole: cal(id).role })
+        get: (id) => {
+          if (!(world.calendarLists[email] || []).includes(id)) throw new Error('Not Found');
+          return { id, accessRole: cal(id).role };
+        },
+        insert: (res) => {
+          if (!world.calendars[res.id] || cal(res.id).role === 'none') throw new Error('Not Found');
+          (world.calendarLists[email] = world.calendarLists[email] || []).push(res.id);
+          return { id: res.id, accessRole: cal(res.id).role };
+        }
       },
       Acl: {
         list: (id) => ({ items: cal(id).c.acl }),
@@ -149,6 +157,7 @@ function createWorld(now) {
           const { c } = cal(id);
           c.acl.push(rule);
           // Simulates the recipient clicking "Add this calendar" in the share email.
+          if (world.shareEmailsLost) return rule;
           (world.calendarLists[rule.scope.value] = world.calendarLists[rule.scope.value] || []).push(id);
           return rule;
         }

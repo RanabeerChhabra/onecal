@@ -1,4 +1,4 @@
-// Founders Meeting Agent — single-file build 2026-10-27 08:37 UTC. Do not edit here; edit src/ and run `npm run bundle`.
+// Founders Meeting Agent — single-file build 2026-10-27 08:51 UTC. Do not edit here; edit src/ and run `npm run bundle`.
 // Paste this whole file into Code.gs of a new Apps Script project in each account. See README.
 
 // ===== Founders Meeting Agent: shared configuration =====
@@ -2095,10 +2095,12 @@ function setup() {
   }
   if (!calId) {
     throw new Error('Could not find the "' + CONFIG.calendarName + '" calendar in ' + me + '. ' +
-      'Run setup() in ' + CONFIG.calendarOwner + ' first, then open the "shared a calendar with you" email in this account and click "Add this calendar". Then run setup() again.');
+      'Run setup() in ' + CONFIG.calendarOwner + ' first. Then either click "Add this calendar" in the "shared with you" email in this account, ' +
+      'or add the Script property SHARED_CALENDAR_ID with the calendar ID that setup printed in ' + CONFIG.calendarOwner + '. Then run setup() again.');
   }
   p.setProperty('SHARED_CALENDAR_ID', calId);
   if (isOwner) shareCalendar_(calId);
+  else addToCalendarList_(calId, me);
 
   // Check we can write to it (the owner must have given this account "Make changes to events").
   var acl = Calendar.CalendarList.get(calId);
@@ -2124,7 +2126,20 @@ function setup() {
     'Decision log: https://docs.google.com/spreadsheets/d/' + p.getProperty('LOG_SHEET_ID'),
     '',
     'Next: run dryRun() and check the log, then run enableSync().'
-  ].join('\n'));
+  ].concat(isOwner ? ['', 'If another account never gets the "shared with you" email, add this Script property there instead:',
+    '  SHARED_CALENDAR_ID = ' + calId] : []).join('\n'));
+}
+
+// Same as clicking "Add this calendar" in the share email, for when that email never arrives.
+function addToCalendarList_(calId, me) {
+  try { Calendar.CalendarList.get(calId); return; } catch (e) { /* not added yet */ }
+  try {
+    Calendar.CalendarList.insert({ id: calId });
+    console.log('Added the shared calendar to ' + me + '.');
+  } catch (e) {
+    throw new Error(me + ' has no access to the shared calendar yet. Run setup() in ' + CONFIG.calendarOwner +
+      ' (it shares the calendar with this account), and check the tryamp.in admin setting "outsiders can change calendars". (' + e.message + ')');
+  }
 }
 
 function findSharedCalendar_() {

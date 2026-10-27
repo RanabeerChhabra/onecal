@@ -64,7 +64,7 @@ Do this **signed in as that account**. Use a browser profile or an incognito win
 6. The log at the bottom should say **✅ Setup done**. Run **dryRun** and read what it would add, either in the log or in the "Founders Meeting Agent — Log" sheet in that account's Drive.
 7. Run **enableSync**. Done. The first few runs also scan the last 6 months of mail, so older meetings fill in over an hour or two.
 
-**The calendar owner's account goes first.** That's the address in `CONFIG.calendarOwner` at the top of `Code.gs`. Its `setup()` creates the shared calendar and shares it, with edit access, with every other account in `CONFIG.accounts`. Each other account then gets an email, "… shared a calendar with you". Click **Add this calendar** in it *before* running `setup()` in that account.
+**The calendar owner's account goes first.** That's the address in `CONFIG.calendarOwner` at the top of `Code.gs`. Its `setup()` creates the shared calendar and shares it, with edit access, with every other account in `CONFIG.accounts`. Each other account then gets an email, "… shared a calendar with you". Click **Add this calendar** in it *before* running `setup()` in that account. If the email never arrives, add the Script property `SHARED_CALENDAR_ID` with the calendar ID the owner's `setup()` printed; `setup()` then adds the calendar itself.
 
 ### Changing who's included
 
