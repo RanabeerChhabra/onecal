@@ -39,7 +39,7 @@ test('brief: day bounds are midnight to midnight IST', () => {
   assert.strictEqual(new Date(d.end).toISOString(), '2026-10-28T18:30:00.000Z');
 });
 
-test('brief end to end: owner sends one email + push per founder; other copies refuse', () => {
+test('brief end to end: owner emails everyone and puts one "☀ Today" event on the shared calendar', () => {
   const world = createWorld(() => NOW);
   const owner = world.account('founders@tryamp.in');
   const r = world.account('ranabeer@school.example');
@@ -47,28 +47,33 @@ test('brief end to end: owner sends one email + push per founder; other copies r
   owner.ctx.setup();
   const cal = world.calendars[owner.props.SHARED_CALENDAR_ID];
   EVENTS.slice(0, 3).forEach((e, i) => { cal.events['b' + i] = Object.assign({ id: 'b' + i, extendedProperties: { private: { fm: '1' } } }, e); });
+  const briefEvents = () => Object.values(cal.events).filter((e) => e.extendedProperties && e.extendedProperties.private.fm_brief);
 
   owner.ctx.enableMorningBrief();
   assert.ok(owner.triggers().includes('sendMorningBrief'));
-  const topics = JSON.parse(owner.props.NTFY_TOPICS);
-  assert.match(topics.R, /^founders-ranabeer-[0-9a-f]{16}$/);
-  assert.ok(owner.logs.some((l) => l.includes(topics.H)));
 
   owner.ctx.sendMorningBrief();
   assert.deepStrictEqual(world.mails.map((m) => m.to), ['ranabeer@school.example',
     'hardik@school.example', 'anshul@school.example']);
-  // Everyone gets the whole team's day.
   assert.ok(world.mails.every((m) => m.subject === 'Wednesday 28 Oct: 3 meetings, first at 13:00'));
-  assert.deepStrictEqual(world.pushes.map((p) => p.topic), [topics.R, topics.H, topics.A]);
-  assert.strictEqual(world.pushes[2].message, '13:00  Quick Chat | Alex [R] · online\n' +
-    '14:00  Chat with Prof. Jane Doe (Brevity) [R+H+A] · Room 12\n16:00  (?) Demo with Acme [H]');
+  assert.match(world.mails[0].body, /14:00  Chat with Prof\. Jane Doe \(Brevity\) \[R\+H\+A\] · Room 12/);
+  assert.deepStrictEqual(world.pushes, []);
 
-  // A day with nothing on: push only, no email.
-  Object.keys(cal.events).forEach((k) => delete cal.events[k]);
+  let b = briefEvents();
+  assert.strictEqual(b.length, 1);
+  assert.strictEqual(b[0].summary, '☀ Today: 13:00 Quick Chat | Alex · 14:00 Chat with Prof. Jane Doe (Brevity) · 16:00 Demo with Acme');
+  assert.strictEqual(b[0].start.dateTime, '2026-10-28T07:10:00+05:30');
+
+  // Running again replaces it instead of adding a second one.
+  owner.ctx.sendMorningBrief();
+  assert.strictEqual(briefEvents().length, 1);
+
+  // A day with nothing on: no email, and the brief event goes away.
+  ['b0', 'b1', 'b2'].forEach((k) => delete cal.events[k]);
   world.mails.length = 0;
   owner.ctx.sendMorningBrief();
   assert.strictEqual(world.mails.length, 0);
-  assert.strictEqual(world.pushes[3].title, 'Wednesday 28 Oct: no meetings');
+  assert.strictEqual(briefEvents().length, 0);
 
   assert.throws(() => r.ctx.sendMorningBrief(), /runs from founders@tryamp\.in only/);
 });

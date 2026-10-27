@@ -78,7 +78,9 @@ var Brief = (function () {
       '<p style="margin:0 0 10px">' + esc(day) + '</p><table style="border-collapse:collapse">' + rows + '</table>' +
       '<p style="margin:16px 0 0;color:#888;font-size:12px">From the "Founders — All Meetings" calendar.</p></div>';
     var n = items.length;
-    return { count: n, title: day + ': ' + n + ' meeting' + (n === 1 ? '' : 's') + ', first at ' + hhmm(items[0].start, tz), text: text, html: html };
+    var oneLine = items.map(function (x) { return hhmm(x.start, tz) + ' ' + x.title; }).join(' · ');
+    return { count: n, title: day + ': ' + n + ' meeting' + (n === 1 ? '' : 's') + ', first at ' + hhmm(items[0].start, tz),
+      text: text, html: html, oneLine: Util.truncate(oneLine, 250) };
   }
 
   return { build: build, dayBounds: dayBounds, fromEvent: fromEvent };
