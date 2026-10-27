@@ -10,6 +10,7 @@ function syncAll(e) {
   try {
     if (e && e.triggerUid && !syncDue_()) return;
     runSync_({ dry: false });
+    refreshTodayItem_();
   } finally { lock.releaseLock(); }
 }
 

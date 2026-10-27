@@ -40,7 +40,8 @@ test('brief: day bounds are midnight to midnight IST', () => {
 });
 
 test('brief end to end: owner emails everyone and puts one "☀ Today" event on the shared calendar', () => {
-  const world = createWorld(() => NOW);
+  let clock = NOW;
+  const world = createWorld(() => clock);
   const owner = world.account('founders@tryamp.in');
   const r = world.account('ranabeer@school.example');
   owner.props.DEEPSEEK_API_KEY = 'ds-test';
@@ -62,10 +63,20 @@ test('brief end to end: owner emails everyone and puts one "☀ Today" event on 
   let b = briefEvents();
   assert.strictEqual(b.length, 1);
   assert.strictEqual(b[0].summary, '☀ Today: 13:00 Quick Chat | Alex · 14:00 Chat with Prof. Jane Doe (Brevity) · 16:00 Demo with Acme');
-  assert.strictEqual(b[0].start.dateTime, '2026-10-28T07:10:00+05:30');
+  assert.deepStrictEqual([b[0].start.date, b[0].end.date], ['2026-10-28', '2026-10-29']);
 
   // Running again replaces it instead of adding a second one.
   owner.ctx.sendMorningBrief();
+  assert.strictEqual(briefEvents().length, 1);
+
+  // Later syncs rewrite it with only what's left.
+  owner.props.SYNC_EVERY_MIN = '0';
+  clock = Date.parse('2026-10-28T13:30:00+05:30');
+  owner.ctx.syncAll();
+  assert.strictEqual(briefEvents()[0].summary, '☀ Left today: 14:00 Chat with Prof. Jane Doe (Brevity) · 16:00 Demo with Acme');
+  clock = Date.parse('2026-10-28T18:00:00+05:30');
+  owner.ctx.syncAll();
+  assert.strictEqual(briefEvents()[0].summary, '☀ Today: all 3 meetings done');
   assert.strictEqual(briefEvents().length, 1);
 
   // A day with nothing on: no email, and the brief event goes away.

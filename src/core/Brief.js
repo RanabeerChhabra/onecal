@@ -48,15 +48,17 @@ var Brief = (function () {
 
   // events: shared-calendar events for the day. Returns { count, title, text, html }.
   // tag null: everyone's meetings, each marked with whose it is. tag "R": only R's, marked with co-founders.
+  // oneLine lists only meetings that haven't ended yet, for the all-day item refreshed during the day.
   function build(events, tag, tz, now) {
     var items = events.map(fromEvent).filter(function (x) { return x && (!tag || x.tags.indexOf(tag) >= 0); })
       .sort(function (a, b) { return a.start - b.start; });
+    var left = items.filter(function (x) { return (x.end || x.start) > now; });
     var day = dayLabel(now, tz);
     var others = function (x) {
       if (!tag) return ' [' + x.tags.join('+') + ']';
       var o = x.tags.filter(function (t) { return t !== tag; }); return o.length ? ' (with ' + o.join('+') + ')' : '';
     };
-    if (!items.length) return { count: 0, title: day + ': no meetings', text: 'Nothing on the shared calendar today.', html: '' };
+    if (!items.length) return { count: 0, left: 0, title: day + ': no meetings', text: 'Nothing on the shared calendar today.', html: '', oneLine: '' };
 
     var text = items.map(function (x) {
       var where = x.joinUrl ? ' · online' : x.location ? ' · ' + x.location : '';
@@ -78,8 +80,8 @@ var Brief = (function () {
       '<p style="margin:0 0 10px">' + esc(day) + '</p><table style="border-collapse:collapse">' + rows + '</table>' +
       '<p style="margin:16px 0 0;color:#888;font-size:12px">From the "Founders — All Meetings" calendar.</p></div>';
     var n = items.length;
-    var oneLine = items.map(function (x) { return hhmm(x.start, tz) + ' ' + x.title; }).join(' · ');
-    return { count: n, title: day + ': ' + n + ' meeting' + (n === 1 ? '' : 's') + ', first at ' + hhmm(items[0].start, tz),
+    var oneLine = left.map(function (x) { return hhmm(x.start, tz) + ' ' + x.title; }).join(' · ');
+    return { count: n, left: left.length, title: day + ': ' + n + ' meeting' + (n === 1 ? '' : 's') + ', first at ' + hhmm(items[0].start, tz),
       text: text, html: html, oneLine: Util.truncate(oneLine, 250) };
   }
 

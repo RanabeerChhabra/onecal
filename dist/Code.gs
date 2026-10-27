@@ -1,4 +1,4 @@
-// Founders Meeting Agent — single-file build 2026-10-27 19:20 UTC. Do not edit here; edit src/ and run `npm run bundle`.
+// Founders Meeting Agent — single-file build 2026-10-27 19:25 UTC. Do not edit here; edit src/ and run `npm run bundle`.
 // Paste this whole file into Code.gs of a new Apps Script project in each account. See README.
 
 // ===== Founders Meeting Agent: shared configuration =====
@@ -1256,15 +1256,17 @@ var Brief = (function () {
 
   // events: shared-calendar events for the day. Returns { count, title, text, html }.
   // tag null: everyone's meetings, each marked with whose it is. tag "R": only R's, marked with co-founders.
+  // oneLine lists only meetings that haven't ended yet, for the all-day item refreshed during the day.
   function build(events, tag, tz, now) {
     var items = events.map(fromEvent).filter(function (x) { return x && (!tag || x.tags.indexOf(tag) >= 0); })
       .sort(function (a, b) { return a.start - b.start; });
+    var left = items.filter(function (x) { return (x.end || x.start) > now; });
     var day = dayLabel(now, tz);
     var others = function (x) {
       if (!tag) return ' [' + x.tags.join('+') + ']';
       var o = x.tags.filter(function (t) { return t !== tag; }); return o.length ? ' (with ' + o.join('+') + ')' : '';
     };
-    if (!items.length) return { count: 0, title: day + ': no meetings', text: 'Nothing on the shared calendar today.', html: '' };
+    if (!items.length) return { count: 0, left: 0, title: day + ': no meetings', text: 'Nothing on the shared calendar today.', html: '', oneLine: '' };
 
     var text = items.map(function (x) {
       var where = x.joinUrl ? ' · online' : x.location ? ' · ' + x.location : '';
@@ -1286,8 +1288,8 @@ var Brief = (function () {
       '<p style="margin:0 0 10px">' + esc(day) + '</p><table style="border-collapse:collapse">' + rows + '</table>' +
       '<p style="margin:16px 0 0;color:#888;font-size:12px">From the "Founders — All Meetings" calendar.</p></div>';
     var n = items.length;
-    var oneLine = items.map(function (x) { return hhmm(x.start, tz) + ' ' + x.title; }).join(' · ');
-    return { count: n, title: day + ': ' + n + ' meeting' + (n === 1 ? '' : 's') + ', first at ' + hhmm(items[0].start, tz),
+    var oneLine = left.map(function (x) { return hhmm(x.start, tz) + ' ' + x.title; }).join(' · ');
+    return { count: n, left: left.length, title: day + ': ' + n + ' meeting' + (n === 1 ? '' : 's') + ', first at ' + hhmm(items[0].start, tz),
       text: text, html: html, oneLine: Util.truncate(oneLine, 250) };
   }
 
@@ -1959,6 +1961,7 @@ function syncAll(e) {
   try {
     if (e && e.triggerUid && !syncDue_()) return;
     runSync_({ dry: false });
+    refreshTodayItem_();
   } finally { lock.releaseLock(); }
 }
 
@@ -2326,23 +2329,23 @@ function showStatus() {
 }
 
 // ---- Morning.js ----
-// 7am morning brief, sent from the calendar owner's copy only (so each founder gets it once):
-// an email to each founder's phone account, and a short "☀ Today: …" event on the shared calendar
-// that Google Calendar shows on everyone's lock screen (via the calendar's default notification).
+// Morning brief, run from the calendar owner's copy only (so each founder gets it once):
+// - around 6:45 an email to each founder's phone account with the whole team's day, and
+// - an all-day "☀ Today: …" item on the shared calendar, rewritten on every 2-hour sync with what's left.
+//   Google Calendar shows it at the top of the day; its all-day notification gives the 7am alert.
 //
 //   enableMorningBrief()   run once in the owner's account
-//   sendMorningBrief()     what the 7am trigger runs; run it by hand to test
+//   sendMorningBrief()     what the morning trigger runs; run it by hand to test
 //   disableMorningBrief()
-
-var BRIEF_EVENT_MIN = 7 * 60 + 10; // 7:10, so a "10 minutes before" notification fires at 7:00
 
 function enableMorningBrief() {
   requireOwner_();
   disableMorningBrief();
   var cfg = getConfig_();
   ScriptApp.newTrigger('sendMorningBrief').timeBased().atHour(6).nearMinute(45).everyDays(1).inTimezone(cfg.defaultTz).create();
-  console.log(['Morning brief on: email around 6:45-7:00 and a "☀ Today" event at 7:10 on the shared calendar (' + cfg.defaultTz + ').',
-    'For the lock-screen alert, set the calendar\'s default notification on each phone to "10 minutes before".',
+  console.log(['Morning brief on: email around 6:45 and an all-day "☀ Today" item on the shared calendar,',
+    'updated every 2 hours with what is left (' + cfg.defaultTz + ').',
+    'For the 7am alert, set the calendar\'s all-day notification on each phone to "On the day at 7:00 AM".',
     'Run sendMorningBrief to test it now.'].join('\n'));
 }
 
@@ -2352,8 +2355,30 @@ function disableMorningBrief() {
   });
 }
 
+function morningBriefOn_() {
+  return ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'sendMorningBrief'; });
+}
+
 function sendMorningBrief() {
   requireOwner_();
+  var b = todayBrief_();
+  if (b.brief.count) {
+    CONFIG.founders.forEach(function (f) {
+      try { MailApp.sendEmail({ to: f.emails[0], subject: b.brief.title, body: b.brief.text, htmlBody: b.brief.html, name: 'Founders Meeting Agent' }); }
+      catch (e) { console.warn('Brief email to ' + f.name + ' failed: ' + e.message); }
+    });
+  }
+  try { putTodayItem_(b); } catch (e) { console.warn('"☀ Today" item failed: ' + e.message); }
+  console.log('Brief sent to ' + CONFIG.founders.map(function (f) { return f.name; }).join(', ') + ': ' + b.brief.title);
+}
+
+// Called after each full sync in the owner's copy: keeps the "☀ Today" item current.
+function refreshTodayItem_() {
+  if (Self.email() !== CONFIG.calendarOwner.toLowerCase() || !morningBriefOn_()) return;
+  try { putTodayItem_(todayBrief_()); } catch (e) { console.warn('"☀ Today" refresh failed: ' + e.message); }
+}
+
+function todayBrief_() {
   var cfg = getConfig_();
   var calId = props_().getProperty('SHARED_CALENDAR_ID');
   var now = Date.now();
@@ -2362,38 +2387,36 @@ function sendMorningBrief() {
     timeMin: new Date(day.start).toISOString(), timeMax: new Date(day.end).toISOString(),
     singleEvents: true, orderBy: 'startTime', privateExtendedProperty: 'fm=1', maxResults: 250
   }).items || [];
-  var b = Brief.build(events, null, cfg.defaultTz, now); // everyone sees the whole team's day
-  if (b.count) {
-    CONFIG.founders.forEach(function (f) {
-      try { MailApp.sendEmail({ to: f.emails[0], subject: b.title, body: b.text, htmlBody: b.html, name: 'Founders Meeting Agent' }); }
-      catch (e) { console.warn('Brief email to ' + f.name + ' failed: ' + e.message); }
-    });
-  }
-  try { putBriefEvent_(calId, day.start, b, cfg); }
-  catch (e) { console.warn('Brief calendar event failed: ' + e.message); }
-  console.log('Brief sent to ' + CONFIG.founders.map(function (f) { return f.name; }).join(', ') + ': ' + b.title);
+  return { calId: calId, day: day, cfg: cfg, now: now, brief: Brief.build(events, null, cfg.defaultTz, now) };
 }
 
-// One "☀ Today" event per day, replaced if the brief runs again. Days with no meetings get none.
-function putBriefEvent_(calId, dayStart, b, cfg) {
-  var key = 'fm_brief=' + new Date(dayStart).toISOString().slice(0, 10);
-  var existing = (Calendar.Events.list(calId, { privateExtendedProperty: key, singleEvents: true, maxResults: 5 }).items || [])
+// One all-day item per day, replaced on every refresh. Days with no meetings get none.
+function putTodayItem_(t) {
+  var tz = t.cfg.defaultTz, b = t.brief;
+  var date = Util.isoInTz(t.day.start, tz).slice(0, 10);
+  var existing = (Calendar.Events.list(t.calId, { privateExtendedProperty: 'fm_brief=' + date, singleEvents: true, maxResults: 5 }).items || [])
     .filter(function (e) { return e.status !== 'cancelled'; });
   if (!b.count) {
-    existing.forEach(function (e) { Calendar.Events.remove(calId, e.id); });
+    existing.forEach(function (e) { Calendar.Events.remove(t.calId, e.id); });
     return;
   }
-  var start = dayStart + BRIEF_EVENT_MIN * 60000;
+  var morning = !existing.length || Util.isoInTz(t.now, tz).slice(11, 13) < '08';
+  var summary = !b.left ? '☀ Today: all ' + b.count + ' meeting' + (b.count === 1 ? '' : 's') + ' done'
+    : (morning ? '☀ Today: ' : '☀ Left today: ') + b.oneLine;
   var ev = {
-    summary: '☀ Today: ' + b.oneLine,
-    description: b.title + '\n\n' + b.text,
-    start: { dateTime: Util.isoInTz(start, cfg.defaultTz), timeZone: cfg.defaultTz },
-    end: { dateTime: Util.isoInTz(start + 5 * 60000, cfg.defaultTz), timeZone: cfg.defaultTz },
+    summary: summary,
+    description: b.title + '\n\n' + b.text + '\n\nUpdated ' + Util.isoInTz(t.now, tz).slice(11, 16) + ' · refreshes every 2 hours',
+    start: { date: date },
+    end: { date: Util.isoInTz(t.day.end, tz).slice(0, 10) },
     transparency: 'transparent',
-    extendedProperties: { 'private': { fm_brief: key.split('=')[1] } }
+    extendedProperties: { 'private': { fm_brief: date } }
   };
-  if (existing.length) Calendar.Events.update(ev, calId, existing[0].id);
-  else Calendar.Events.insert(ev, calId);
+  if (existing.length) {
+    if (existing[0].summary === ev.summary && existing[0].description === ev.description) return;
+    Calendar.Events.update(ev, t.calId, existing[0].id);
+  } else {
+    Calendar.Events.insert(ev, t.calId);
+  }
 }
 
 function requireOwner_() {
