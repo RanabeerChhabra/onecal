@@ -157,10 +157,14 @@ test('after the backfill, the 10-minute trigger only does a full sync every 2 ho
   const lastSync = () => JSON.parse(c.props.SELF).lastSync;
   assert.strictEqual(JSON.parse(c.props.SELF).backfill.phase, 'done');
   const t0 = lastSync();
+  const trigger = { triggerUid: 't1' };
   clock = t0 + 30 * 60000;
-  c.ctx.syncAll();
+  c.ctx.syncAll(trigger);
   assert.strictEqual(lastSync(), t0, 'skipped 30 min later');
   clock = t0 + 2 * 3600000;
-  c.ctx.syncAll();
+  c.ctx.syncAll(trigger);
   assert.strictEqual(lastSync(), clock, 'ran 2 hours later');
+  clock += 60000;
+  c.ctx.syncAll();
+  assert.strictEqual(lastSync(), clock, 'a manual Run always syncs');
 });

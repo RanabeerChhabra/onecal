@@ -57,9 +57,11 @@ test('brief end to end: owner sends one email + push per founder; other copies r
   owner.ctx.sendMorningBrief();
   assert.deepStrictEqual(world.mails.map((m) => m.to), ['ranabeer@school.example',
     'hardik@school.example', 'anshul@school.example']);
-  assert.strictEqual(world.mails[0].subject, 'Wednesday 28 Oct: 2 meetings, first at 13:00');
+  // Everyone gets the whole team's day.
+  assert.ok(world.mails.every((m) => m.subject === 'Wednesday 28 Oct: 3 meetings, first at 13:00'));
   assert.deepStrictEqual(world.pushes.map((p) => p.topic), [topics.R, topics.H, topics.A]);
-  assert.strictEqual(world.pushes[2].title, 'Wednesday 28 Oct: 1 meeting, first at 14:00');
+  assert.strictEqual(world.pushes[2].message, '13:00  Quick Chat | Alex [R] · online\n' +
+    '14:00  Chat with Prof. Jane Doe (Brevity) [R+H+A] · Room 12\n16:00  (?) Demo with Acme [H]');
 
   // A day with nothing on: push only, no email.
   Object.keys(cal.events).forEach((k) => delete cal.events[k]);

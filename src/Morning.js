@@ -33,8 +33,8 @@ function sendMorningBrief() {
     singleEvents: true, orderBy: 'startTime', privateExtendedProperty: 'fm=1', maxResults: 250
   }).items || [];
   var topics = ntfyTopics_();
+  var b = Brief.build(events, null, cfg.defaultTz, now); // everyone sees the whole team's day
   CONFIG.founders.forEach(function (f) {
-    var b = Brief.build(events, f.tag, cfg.defaultTz, now);
     try {
       if (b.count) MailApp.sendEmail({ to: f.emails[0], subject: b.title, body: b.text, htmlBody: b.html, name: 'Founders Meeting Agent' });
     } catch (e) { console.warn('Brief email to ' + f.name + ' failed: ' + e.message); }
@@ -43,8 +43,8 @@ function sendMorningBrief() {
         payload: JSON.stringify({ topic: topics[f.tag], title: b.title, message: b.text, tags: ['calendar'],
           click: 'https://calendar.google.com/calendar/r/day' }) });
     } catch (e) { console.warn('Brief push to ' + f.name + ' failed: ' + e.message); }
-    console.log('Brief for ' + f.name + ': ' + b.title);
   });
+  console.log('Brief sent to ' + CONFIG.founders.map(function (f) { return f.name; }).join(', ') + ': ' + b.title);
 }
 
 function requireOwner_() {

@@ -1,4 +1,4 @@
-// The morning brief: one founder's meetings for the day, as plain text (push) and HTML (email).
+// The morning brief: the whole team's meetings for the day (or one founder's), as plain text (push) and HTML (email).
 // Works from shared-calendar events, whose titles start with the owner tag, e.g. "[R+H] (?) Demo with Acme".
 
 var Brief = (function () {
@@ -46,12 +46,16 @@ var Brief = (function () {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // events: shared-calendar events for the day. Returns { count, title, text, html } for founder `tag`.
+  // events: shared-calendar events for the day. Returns { count, title, text, html }.
+  // tag null: everyone's meetings, each marked with whose it is. tag "R": only R's, marked with co-founders.
   function build(events, tag, tz, now) {
-    var items = events.map(fromEvent).filter(function (x) { return x && x.tags.indexOf(tag) >= 0; })
+    var items = events.map(fromEvent).filter(function (x) { return x && (!tag || x.tags.indexOf(tag) >= 0); })
       .sort(function (a, b) { return a.start - b.start; });
     var day = dayLabel(now, tz);
-    var others = function (x) { var o = x.tags.filter(function (t) { return t !== tag; }); return o.length ? ' (with ' + o.join('+') + ')' : ''; };
+    var others = function (x) {
+      if (!tag) return ' [' + x.tags.join('+') + ']';
+      var o = x.tags.filter(function (t) { return t !== tag; }); return o.length ? ' (with ' + o.join('+') + ')' : '';
+    };
     if (!items.length) return { count: 0, title: day + ': no meetings', text: 'Nothing on the shared calendar today.', html: '' };
 
     var text = items.map(function (x) {

@@ -3,11 +3,12 @@
 var BUDGET_MS = 4.5 * 60 * 1000;     // Apps Script stops a run at 6 minutes.
 var MAX_THREADS_PER_ACCOUNT = 60;    // per run; the rest waits in the account's retry list
 
-function syncAll() {
+// e is set when the time trigger runs it; a manual Run from the editor always does a full sync.
+function syncAll(e) {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(5000)) { console.log('Previous sync still running; skipping this one.'); return; }
   try {
-    if (!syncDue_()) return;
+    if (e && e.triggerUid && !syncDue_()) return;
     runSync_({ dry: false });
   } finally { lock.releaseLock(); }
 }

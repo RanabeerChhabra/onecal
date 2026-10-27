@@ -1,4 +1,4 @@
-// Founders Meeting Agent — single-file build 2026-10-27 18:51 UTC. Do not edit here; edit src/ and run `npm run bundle`.
+// Founders Meeting Agent — single-file build 2026-10-27 19:03 UTC. Do not edit here; edit src/ and run `npm run bundle`.
 // Paste this whole file into Code.gs of a new Apps Script project in each account. See README.
 
 // ===== Founders Meeting Agent: shared configuration =====
@@ -1206,7 +1206,7 @@ var Reconcile = (function () {
 })();
 
 // ---- core/Brief.js ----
-// The morning brief: one founder's meetings for the day, as plain text (push) and HTML (email).
+// The morning brief: the whole team's meetings for the day (or one founder's), as plain text (push) and HTML (email).
 // Works from shared-calendar events, whose titles start with the owner tag, e.g. "[R+H] (?) Demo with Acme".
 
 var Brief = (function () {
@@ -1254,12 +1254,16 @@ var Brief = (function () {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // events: shared-calendar events for the day. Returns { count, title, text, html } for founder `tag`.
+  // events: shared-calendar events for the day. Returns { count, title, text, html }.
+  // tag null: everyone's meetings, each marked with whose it is. tag "R": only R's, marked with co-founders.
   function build(events, tag, tz, now) {
-    var items = events.map(fromEvent).filter(function (x) { return x && x.tags.indexOf(tag) >= 0; })
+    var items = events.map(fromEvent).filter(function (x) { return x && (!tag || x.tags.indexOf(tag) >= 0); })
       .sort(function (a, b) { return a.start - b.start; });
     var day = dayLabel(now, tz);
-    var others = function (x) { var o = x.tags.filter(function (t) { return t !== tag; }); return o.length ? ' (with ' + o.join('+') + ')' : ''; };
+    var others = function (x) {
+      if (!tag) return ' [' + x.tags.join('+') + ']';
+      var o = x.tags.filter(function (t) { return t !== tag; }); return o.length ? ' (with ' + o.join('+') + ')' : '';
+    };
     if (!items.length) return { count: 0, title: day + ': no meetings', text: 'Nothing on the shared calendar today.', html: '' };
 
     var text = items.map(function (x) {
@@ -1946,11 +1950,12 @@ var Backfill = (function () {
 var BUDGET_MS = 4.5 * 60 * 1000;     // Apps Script stops a run at 6 minutes.
 var MAX_THREADS_PER_ACCOUNT = 60;    // per run; the rest waits in the account's retry list
 
-function syncAll() {
+// e is set when the time trigger runs it; a manual Run from the editor always does a full sync.
+function syncAll(e) {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(5000)) { console.log('Previous sync still running; skipping this one.'); return; }
   try {
-    if (!syncDue_()) return;
+    if (e && e.triggerUid && !syncDue_()) return;
     runSync_({ dry: false });
   } finally { lock.releaseLock(); }
 }
@@ -2354,8 +2359,8 @@ function sendMorningBrief() {
     singleEvents: true, orderBy: 'startTime', privateExtendedProperty: 'fm=1', maxResults: 250
   }).items || [];
   var topics = ntfyTopics_();
+  var b = Brief.build(events, null, cfg.defaultTz, now); // everyone sees the whole team's day
   CONFIG.founders.forEach(function (f) {
-    var b = Brief.build(events, f.tag, cfg.defaultTz, now);
     try {
       if (b.count) MailApp.sendEmail({ to: f.emails[0], subject: b.title, body: b.text, htmlBody: b.html, name: 'Founders Meeting Agent' });
     } catch (e) { console.warn('Brief email to ' + f.name + ' failed: ' + e.message); }
@@ -2364,8 +2369,8 @@ function sendMorningBrief() {
         payload: JSON.stringify({ topic: topics[f.tag], title: b.title, message: b.text, tags: ['calendar'],
           click: 'https://calendar.google.com/calendar/r/day' }) });
     } catch (e) { console.warn('Brief push to ' + f.name + ' failed: ' + e.message); }
-    console.log('Brief for ' + f.name + ': ' + b.title);
   });
+  console.log('Brief sent to ' + CONFIG.founders.map(function (f) { return f.name; }).join(', ') + ': ' + b.title);
 }
 
 function requireOwner_() {
