@@ -13,7 +13,8 @@ var Settings = (function () {
     LOOKAHEAD_DAYS: '120',
     INCLUDE_ALL_DAY: 'false',
     DRY_RUN_DAYS: '14',
-    DRY_RUN_MAX_THREADS: '40'
+    DRY_RUN_MAX_THREADS: '40',
+    SYNC_EVERY_MIN: '120'  // the trigger fires every 10 min; runs in between are skipped (except during the backfill)
   };
 
   var PROVIDERS = {
@@ -65,6 +66,7 @@ var Settings = (function () {
       includeAllDay: get('INCLUDE_ALL_DAY') === 'true',
       dryRunDays: parseInt(get('DRY_RUN_DAYS'), 10),
       dryRunMaxThreads: parseInt(get('DRY_RUN_MAX_THREADS'), 10),
+      syncEveryMin: parseInt(get('SYNC_EVERY_MIN'), 10),
       founders: founders,
       founderOf: founderOf,
       founderName: founderName,

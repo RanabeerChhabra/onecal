@@ -1,4 +1,4 @@
-// The sync loop. syncAll() runs from a time trigger every 10 minutes; dryRun() is the manual preview.
+// The sync loop. syncAll() runs from a time trigger every 10 minutes (a full sync every 2 hours); dryRun() is the manual preview.
 
 var BUDGET_MS = 4.5 * 60 * 1000;     // Apps Script stops a run at 6 minutes.
 var MAX_THREADS_PER_ACCOUNT = 60;    // per run; the rest waits in the account's retry list
@@ -6,7 +6,19 @@ var MAX_THREADS_PER_ACCOUNT = 60;    // per run; the rest waits in the account's
 function syncAll() {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(5000)) { console.log('Previous sync still running; skipping this one.'); return; }
-  try { runSync_({ dry: false }); } finally { lock.releaseLock(); }
+  try {
+    if (!syncDue_()) return;
+    runSync_({ dry: false });
+  } finally { lock.releaseLock(); }
+}
+
+// The trigger fires every 10 minutes, but a full sync only runs every SYNC_EVERY_MIN (2 hours by default).
+// While the first-run backfill is still going, every trigger counts, so it finishes in hours, not days.
+function syncDue_() {
+  var a = Self.account();
+  var backfilling = (a.backfill && a.backfill.phase === 'list') || Backfill.status().pendingBatches > 0;
+  if (backfilling || !a.lastSync) return true;
+  return Date.now() - a.lastSync >= (getConfig_().syncEveryMin - 5) * 60000;
 }
 
 // Prints what would be added/changed for mail from the last DRY_RUN_DAYS days + all calendars,

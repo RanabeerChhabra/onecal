@@ -38,6 +38,7 @@ test.before(() => {
   for (const e of [R, H, A, AMP, BREVITY]) {
     copies[e] = world.account(e);
     copies[e].props.ANTHROPIC_API_KEY = 'sk-test';
+    copies[e].props.SYNC_EVERY_MIN = '0'; // these tests sync back to back; the 2-hour pacing has its own test
   }
   for (const name of ['confirmed', 'vague', 'accelerator', 'calendly', 'newsletter']) {
     const f = load(name + '.json');
@@ -148,4 +149,18 @@ test('removeThisAccount clears that account\'s upcoming meetings and stops its s
   assert.ok(!summaries().some((s) => s.includes('Neha Kapoor')));
   assert.ok(!summaries().some((s) => s.includes('Accelerator')));
   assert.ok(summaries().some((s) => s.includes('Sequoia')));
+});
+
+test('after the backfill, the 10-minute trigger only does a full sync every 2 hours', () => {
+  const c = copies[R];
+  c.props.SYNC_EVERY_MIN = '120';
+  const lastSync = () => JSON.parse(c.props.SELF).lastSync;
+  assert.strictEqual(JSON.parse(c.props.SELF).backfill.phase, 'done');
+  const t0 = lastSync();
+  clock = t0 + 30 * 60000;
+  c.ctx.syncAll();
+  assert.strictEqual(lastSync(), t0, 'skipped 30 min later');
+  clock = t0 + 2 * 3600000;
+  c.ctx.syncAll();
+  assert.strictEqual(lastSync(), clock, 'ran 2 hours later');
 });
