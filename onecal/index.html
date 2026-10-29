@@ -22,7 +22,7 @@
   --marigold: #E2A100; --marigold-ink: #8A6200; --marigold-soft: #FCF1D2;
   --teal: #17756B; --teal-ink: #0F574F; --teal-soft: #DDF0EC;
   --sage: #7FB7A4; --aqua: #4CC0B1; --red: #B4413C; --red-soft: #F8E1DF;
-  --shadow: 0 1px 2px rgba(16,32,30,.06), 0 12px 32px -12px rgba(16,32,30,.18);
+  --shadow: 0 1px 2px rgba(16,32,30,.05), 0 8px 24px -14px rgba(16,32,30,.16);
   --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
   --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -41,18 +41,18 @@
 body { background: var(--mist); color: var(--ink); font: 400 16.5px/1.6 var(--body); -webkit-font-smoothing: antialiased }
 .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)) }
 h1, h2, h3, h4 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.025em; color: var(--ink) }
-h1 { font-size: clamp(2.7rem, 6vw, 4.6rem); line-height: 1; font-weight: 800 }
-h2 { font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.05; font-weight: 700 }
+h1 { font-size: clamp(2.5rem, 5.2vw, 4rem); line-height: 1.04; font-weight: 700 }
+h2 { font-size: clamp(1.8rem, 3.2vw, 2.5rem); line-height: 1.1; font-weight: 700 }
 h3 { font-size: 1.25rem; line-height: 1.2; font-weight: 700; letter-spacing: -0.015em }
 h4 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em }
 p { margin: 0 }
 a { color: inherit }
-.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--teal) }
-.eyebrow::before { content: ""; width: 18px; height: 2px; background: currentColor; border-radius: 2px }
+.eyebrow { display: inline-block; font: 600 13.5px/1.2 var(--body); color: var(--teal) }
+
 .lede { font-size: 1.12rem; color: var(--muted); max-width: 33em }
 .mono { font-family: var(--mono) }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--body); padding: 13px 20px; border-radius: 10px; border: 1px solid var(--ink); background: var(--ink); color: var(--mist); cursor: pointer; text-decoration: none; transition: transform .15s ease }
-.btn:hover { transform: translateY(-1px) }
+.btn:hover { opacity: .9 }
 .btn.ghost { background: var(--paper); color: var(--ink); border-color: var(--line) }
 .btn.sm { padding: 9px 14px; font-size: 14px; border-radius: 8px }
 :focus-visible { outline: 3px solid var(--marigold); outline-offset: 3px; border-radius: 6px }
@@ -94,6 +94,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center }
 .hero-meta { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; font: 400 13px/1.4 var(--mono); color: var(--muted) }
 .hero-meta span::before { content: "✓ "; color: var(--teal) }
+.shot { margin-top: clamp(36px, 5vw, 56px); padding: clamp(12px, 2.4vw, 28px); border-radius: 20px; background: linear-gradient(180deg, var(--teal-soft), color-mix(in srgb, var(--teal-soft) 35%, var(--mist))) }
+.shot-cap { text-align: center; margin-top: 14px }
 .stage { position: relative; margin-top: clamp(40px, 6vw, 64px); display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0; align-items: start }
 .stage .sources { margin-top: 70px }
 .sources { display: grid; gap: 14px; position: relative; z-index: 2 }
@@ -102,7 +104,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .src b { display: block; font-weight: 600; font-size: 13px; color: var(--ink) }
 .src small { display: block; color: var(--muted); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .lanes { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; pointer-events: none }
-.lanes path { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 5 9; animation: flow 1.4s linear infinite }
+.lanes path { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 5 9 }
 @keyframes flow { to { stroke-dashoffset: -28 } }
 .calwin { margin-left: 110px; position: relative; z-index: 2 }
 
@@ -134,6 +136,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .link { color: var(--teal); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere }
 
 /* works-with strip */
+.pains .wrap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-block: 8px }
+.pains { padding-block: 40px 0 }
+.pain { display: grid; gap: 8px; align-content: start; padding-top: 18px; border-top: 2px solid var(--ink) }
+.pain p { color: var(--muted); font-size: 15.5px }
 .strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 34px; padding-block: 26px; border-block: 1px solid var(--line); font: 500 13px/1 var(--mono); color: var(--muted) }
 .strip b { color: var(--ink-2); font-weight: 500 }
 
@@ -163,7 +169,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .st.ok { background: var(--teal-soft); color: var(--teal-ink) } .st.wait { background: var(--line-2); color: var(--muted) }
 .mini-lanes { border-left: 1px solid var(--line); display: grid; place-items: center; padding: 10px }
 .mini-lanes svg { width: 100%; max-width: 130px; height: auto }
-.mini-lanes path { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 5 8; animation: flow 1.4s linear infinite }
+.mini-lanes path { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 5 8 }
 
 /* review mock */
 .rev { padding: 18px; display: grid; gap: 12px; min-width: 520px }
@@ -186,19 +192,19 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .mail-head { display: grid; gap: 2px; font-size: 12.5px; color: var(--muted); padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--line) }
 .mail-head b { color: var(--ink); font-weight: 600 }
 .mail p { font-size: 15.5px; color: var(--ink-2) }
-.hl { border-radius: 4px; padding: 0 3px; animation: hl 6s ease-in-out infinite }
+.hl { border-radius: 4px; padding: 0 3px; background: var(--marigold-soft); box-shadow: inset 0 -2px 0 var(--marigold) }
 .hl.b { animation-delay: .5s }
 @keyframes hl { 0%, 15% { background: transparent } 25%, 85% { background: var(--marigold-soft); box-shadow: inset 0 -2px 0 var(--marigold) } 100% { background: transparent } }
 .arrow { display: grid; justify-items: center; gap: 6px; font: 400 11px/1.3 var(--mono); color: var(--muted); text-align: center }
-.arrow svg { width: 72px; height: 24px } .arrow path { stroke: var(--teal); stroke-width: 2; fill: none; stroke-dasharray: 5 6; animation: flow 1.2s linear infinite }
-.evcard { padding: 20px 22px; position: relative; overflow: hidden; min-width: 0; animation: pop 6s ease-out infinite }
+.arrow svg { width: 72px; height: 24px } .arrow path { stroke: var(--teal); stroke-width: 2; fill: none }
+.evcard { padding: 20px 22px; position: relative; overflow: hidden; min-width: 0 }
 .evcard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--teal) }
 @keyframes pop { 0%, 30% { transform: translateY(6px); opacity: .4 } 40%, 90% { transform: none; opacity: 1 } 100% { opacity: .4 } }
 .kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; font-size: 14px; margin-top: 14px }
 .kv dt { color: var(--muted); font: 400 12px/1.6 var(--mono) } .kv dd { margin: 0; overflow-wrap: anywhere; color: var(--ink-2) }
 .conf { display: flex; align-items: center; gap: 10px; margin-top: 14px; font: 500 12px/1 var(--mono); color: var(--muted) }
 .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--line-2); position: relative; overflow: hidden }
-.bar i { position: absolute; inset: 0 auto 0 0; width: 95%; background: var(--teal); border-radius: 3px; animation: fill 6s ease-out infinite }
+.bar i { position: absolute; inset: 0 auto 0 0; width: 95%; background: var(--teal); border-radius: 3px }
 @keyframes fill { 0%, 30% { width: 0 } 50%, 100% { width: 95% } }
 
 /* decision log */
@@ -269,6 +275,20 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .principles .k { font: 500 12px/1 var(--mono); color: var(--teal) }
 
 /* cta */
+.faq { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); gap: clamp(24px, 5vw, 64px); align-items: start }
+.qs { display: grid; border-top: 1px solid var(--line) }
+.qs details { border-bottom: 1px solid var(--line); padding: 18px 0 }
+.qs summary { cursor: pointer; font: 600 16.5px/1.4 var(--body); list-style: none; display: flex; justify-content: space-between; gap: 16px }
+.qs summary::-webkit-details-marker { display: none }
+.qs summary::after { content: "+"; font: 400 20px/1 var(--body); color: var(--muted) }
+.qs details[open] summary::after { content: "–" }
+.qs p { color: var(--muted); margin-top: 10px; max-width: 40em }
+.foot { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 28px; padding-block: 48px 28px; border-top: 1px solid var(--line) }
+.foot h4 { font: 600 13px/1 var(--body); color: var(--ink); margin-bottom: 12px }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; color: var(--muted) }
+.foot a { text-decoration: none } .foot a:hover { color: var(--ink) }
+.foot p { color: var(--muted); font-size: 14px; max-width: 24em; margin-top: 12px }
+.legal { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 18px 40px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted) }
 .cta { background: var(--ink); color: var(--mist); border-radius: 24px; padding: clamp(40px, 7vw, 80px) clamp(22px, 5vw, 64px); display: grid; gap: 18px; justify-items: center; text-align: center; position: relative; overflow: hidden }
 .cta h2 { color: var(--mist) }
 .cta p { color: color-mix(in srgb, var(--mist) 72%, transparent); max-width: 32em }
@@ -278,38 +298,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .addr .btn { background: var(--marigold); border-color: var(--marigold); color: #10201E }
 .cta-lanes { position: absolute; inset: auto 0 0 0; height: 70px; opacity: .55; pointer-events: none }
 .cta-lanes path { fill: none; stroke-width: 2; stroke-dasharray: 5 9; animation: flow 1.6s linear infinite }
-footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 36px 48px; color: var(--muted); font-size: 13.5px }
+
 footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
 
-/* motion layer */
-.hero h1 .gold { background-image: linear-gradient(var(--marigold), var(--marigold)); background-repeat: no-repeat; background-position: 0 92%; background-size: 100% 6px; padding-bottom: 4px; animation: underline 1.2s .5s cubic-bezier(.2,.7,.2,1) both }
-@keyframes underline { from { background-size: 0 6px } to { background-size: 100% 6px } }
-.hero-top > * { animation: rise .8s cubic-bezier(.2,.7,.2,1) both }
-.hero-top > :nth-child(2) { animation-delay: .08s } .hero-top > :nth-child(3) { animation-delay: .16s } .hero-top > :nth-child(4) { animation-delay: .24s } .hero-top > :nth-child(5) { animation-delay: .32s }
-@keyframes rise { from { transform: translateY(18px) } to { transform: none } }
-.calwin { transition: transform .5s cubic-bezier(.2,.7,.2,1); transform-style: preserve-3d; will-change: transform }
-.packet { fill: currentColor; filter: drop-shadow(0 0 4px currentColor) }
-.ev.ping { animation: ping .9s ease-out }
-@keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--marigold) 70%, transparent); transform: scale(1.04) } 100% { box-shadow: 0 0 0 12px transparent; transform: none } }
-.ev.sel.ping { animation: pingsel .9s ease-out }
-@keyframes pingsel { 0% { box-shadow: 0 0 0 2px var(--ink), 0 0 0 2px color-mix(in srgb, var(--marigold) 70%, transparent); transform: scale(1.04) } 100% { box-shadow: 0 0 0 2px var(--ink), 0 0 0 14px transparent; transform: none } }
-.reveal { transform: translateY(36px) scale(.985); transition: transform .9s cubic-bezier(.2,.7,.2,1) }
-.reveal.in { transform: none }
-.card, .win { transition: transform .25s ease, box-shadow .25s ease }
-.feat:hover, .row .win:hover { transform: translateY(-4px) }
-.st.busy { background: var(--marigold-soft); color: var(--marigold-ink) }
-.st.busy::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 6px; border-radius: 50%; border: 1.5px solid currentColor; border-right-color: transparent; vertical-align: -1px; animation: spin .7s linear infinite }
-@keyframes spin { to { transform: rotate(360deg) } }
-#samlane { transition: opacity .5s } #samlane.off { opacity: .12 }
-.chk.tick { animation: tick 4.8s ease-in-out infinite }
-@keyframes tick { 0%, 20% { transform: scale(.4); opacity: .2 } 28% { transform: scale(1.15); opacity: 1 } 34%, 100% { transform: none; opacity: 1 } }
-#logtable tbody tr.new td { animation: rowflash 2.2s ease-out }
-@keyframes rowflash { 0% { background: var(--marigold-soft); transform: translateX(-8px) } 100% { background: transparent; transform: none } }
-.today-bar span { transition: opacity .35s } .today-bar span.swap { opacity: 0 }
-.btn.primary-pulse { animation: btnpulse 2.6s ease-in-out infinite }
-@keyframes btnpulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ink) 35%, transparent) } 50% { box-shadow: 0 0 0 8px transparent } }
-.sun { animation: sunglow 3s ease-in-out infinite }
-@keyframes sunglow { 50% { box-shadow: 0 0 0 10px var(--marigold-soft) } }
 
 @media (max-width: 980px) {
   .stage { grid-template-columns: minmax(0, 1fr) }
@@ -322,6 +313,9 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
   .principles { grid-template-columns: repeat(2, minmax(0, 1fr)) }
   .principles div:nth-child(3) { padding-left: 0; border-left: 0 }
   .principles div { padding-bottom: 22px }
+}
+@media (max-width: 860px) {
+  .pains .wrap, .faq, .foot { grid-template-columns: minmax(0, 1fr) }
 }
 @media (max-width: 640px) {
   .navlinks a { display: none }
@@ -344,7 +338,7 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
       Onecal
     </a>
     <nav class="navlinks" aria-label="Main">
-      <a href="#how">How it works</a><a href="#brief">Morning brief</a><a href="#teams">For teams</a>
+      <a href="#how">How it works</a><a href="#brief">Morning brief</a><a href="#faq">FAQ</a>
       <a class="btn sm" href="#access" style="display:inline-flex">Get early access</a>
     </nav>
   </div>
@@ -354,24 +348,14 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
   <section class="hero">
     <div class="wrap">
       <div class="hero-top">
-        <span class="eyebrow">Many inboxes, one calendar</span>
-        <h1>Every meeting your team has, <span class="gold">in one calendar.</span></h1>
-        <p class="lede">Onecal reads your team's Gmail and Google Calendars, finds the meetings that are actually confirmed, and puts them on one shared calendar. Deduped, tagged by who's in them, with the join link and the email it came from.</p>
-        <div class="hero-ctas"><a class="btn primary-pulse" href="#access">Get early access</a><a class="btn ghost" href="#how">See how it works</a></div>
-        <div class="hero-meta"><span>Runs inside Google Workspace</span><span>Dry run before anything is written</span><span>Every decision explained</span></div>
+        <span class="eyebrow">For Google Workspace and Gmail teams</span>
+        <h1>One calendar for every meeting your team has</h1>
+        <p class="lede">Onecal reads everyone's Gmail and Google Calendar, picks out the meetings that are confirmed, and adds them to one shared calendar. Duplicates are merged, and each event shows who's in it, the join link and the email it came from.</p>
+        <div class="hero-ctas"><a class="btn" href="#access">Get early access</a><a class="btn ghost" href="#how">See how it works</a></div>
+        <div class="hero-meta"><span>Works with your existing Google Calendar</span><span>Preview before anything is added</span></div>
       </div>
 
-      <div class="stage">
-        <div class="sources" aria-label="Connected inboxes">
-          <div class="src"><span class="dot" style="background:#17756B">P</span><div style="min-width:0"><b>Priya</b><small>priya@orbit.school.edu</small></div></div>
-          <div class="src"><span class="dot" style="background:#7FB7A4">D</span><div style="min-width:0"><b>Dev</b><small>dev@orbit.school.edu</small></div></div>
-          <div class="src"><span class="dot" style="background:#E2A100">S</span><div style="min-width:0"><b>Sam</b><small>sam@gmail.com</small></div></div>
-          <div class="src"><span class="dot" style="background:#3E5A55">T</span><div style="min-width:0"><b>Shared inbox</b><small>founders@orbitlabs.co</small></div></div>
-        </div>
-        <svg class="lanes" id="lanes" aria-hidden="true">
-          <path stroke="#17756B"/><path stroke="#7FB7A4" style="animation-delay:-.4s"/><path stroke="#E2A100" style="animation-delay:-.8s"/><path stroke="#4CC0B1" style="animation-delay:-1.1s"/>
-        </svg>
-
+      <div class="shot">
         <div class="win calwin">
           <div class="win-bar">
             <span class="brand"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke-width="6" stroke-linecap="round"><path d="M6 13 C 26 13, 30 25, 44 26" stroke="#17756B"/><path d="M6 32 H44" stroke="#E2A100"/><path d="M6 51 C 26 51, 30 39, 44 38" stroke="#4CC0B1"/></g><rect x="46" y="10" width="10" height="44" rx="3" fill="var(--ink)"/></svg>Onecal</span>
@@ -414,14 +398,19 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
           </div>
         </div>
       </div>
+      <p class="cap shot-cap">The shared team calendar: one event per meeting, tagged by who's in it, with the source email attached.</p>
     </div>
   </section>
 
-  <div class="wrap"><div class="strip"><span>Works with <b>Gmail</b></span><span><b>Google Calendar</b></span><span><b>Google Workspace</b></span><span>iPhone and Android <b>Calendar widgets</b></span></div></div>
+  <section class="pains"><div class="wrap">
+    <div class="pain"><h3>Meetings live in five inboxes</h3><p>Personal Gmail, university mail, the company inbox, the shared founders@ address. Nobody sees all of it.</p></div>
+    <div class="pain"><h3>Invites get lost in threads</h3><p>"Thursday at 4 works" never becomes a calendar event, so someone double-books.</p></div>
+    <div class="pain"><h3>Changes don't reach everyone</h3><p>A meeting moves or gets cancelled by email, and half the team still has the old time.</p></div>
+  </div></section>
 
   <section id="how">
     <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">How it works</span><h2>Trust first, then automation.</h2><p class="lede">You see what Onecal found, and why, before a single event reaches your calendar.</p></div>
+      <div class="sec-head"><span class="eyebrow">How it works</span><h2>Connect, review, then let it run</h2><p class="lede">You see what Onecal found and why before anything is added to your calendar.</p></div>
       <div class="flow">
         <div class="row">
           <div class="copy"><span class="num">01 · Connect</span><h3>Connect each inbox and calendar</h3><p>Personal, university, company and shared inboxes. Each one becomes a lane into the same team calendar, and you see exactly what Onecal can read.</p>
@@ -475,7 +464,7 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
 
   <section style="background:var(--paper); border-block:1px solid var(--line)">
     <div class="wrap">
-      <div class="sec-head center"><span class="eyebrow">Reads email like a person would</span><h2>"Thursday at 4 works" becomes a meeting.</h2><p class="lede">Relative dates are worked out from when the email was sent, in the right timezone, and you can see the exact line it relied on.</p></div>
+      <div class="sec-head center"><span class="eyebrow">Email to event</span><h2>"Thursday at 4 works" becomes a meeting</h2><p class="lede">Relative dates are worked out from when the email was sent, in the right timezone, and you can see the exact line it relied on.</p></div>
       <div class="demo">
         <article class="card mail" aria-label="Example email">
           <div class="mail-head"><span><b>Maya Chen</b> &lt;maya@sequoia.example&gt;</span><span>Sent Mon 26 Oct, 09:02 IST · Re: Intro call</span></div>
@@ -494,7 +483,7 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
 
   <section>
     <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">What it handles</span><h2>The messy parts of meetings, handled.</h2></div>
+      <div class="sec-head"><span class="eyebrow">Features</span><h2>What Onecal takes care of</h2></div>
       <div class="features">
         <div class="card feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6c6 0 8 5 13 5M3 18c6 0 8-5 13-5M17 7v10"/></svg></span><h3>One event, not four</h3><p>The same invite in three inboxes and a calendar becomes one event, matched by invite ID, thread, join link and attendees.</p></div>
         <div class="card feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2M20 4v5h-5M4 20v-5h5"/></svg></span><h3>Moved or cancelled</h3><p>"Can we push to Friday 11?" moves it. "Need to cancel Monday" removes it for everyone, even if the invite is still in someone's calendar.</p></div>
@@ -508,7 +497,7 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
 
   <section id="brief" style="background:var(--paper); border-block:1px solid var(--line)">
     <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">Morning brief</span><h2>Your team's day, on your lock screen.</h2><p class="lede">A short email at 6:45 and an all-day "☀ Today" line that rewrites itself every two hours with what's left. It shows in the Calendar app and widgets you already use.</p></div>
+      <div class="sec-head"><span class="eyebrow">Morning brief</span><h2>A morning summary of your team's day</h2><p class="lede">A short email at 6:45 and an all-day "☀ Today" line that rewrites itself every two hours with what's left. It shows in the Calendar app and widgets you already use.</p></div>
       <div class="brief">
         <div class="card settings">
           <div class="toggle"><span class="sw" aria-hidden="true"></span>Send morning brief</div>
@@ -532,15 +521,14 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
             <div class="wdg"><div class="h"><span class="sun" style="width:10px;height:10px;box-shadow:0 0 0 2px #FCF1D2"></span>Left today</div><div class="r"><b>13:00</b>Northwind demo</div><div class="r"><b>16:00</b>Product sync</div><div class="r"><b>17:30</b>(?) Coffee, Arjun</div></div>
             <div class="wdg"><div class="h" style="color:#17756B">Up next</div><div class="r"><b>13:00</b>Northwind demo · Meet</div></div>
           </div></div>
-          <div class="phone"><div class="scr light"><div class="done"><span class="sun"></span><b>All done</b>You're all caught up for today.</div></div></div>
-        </div>
+                  </div>
       </div>
     </div>
   </section>
 
   <section id="teams">
     <div class="wrap teams">
-      <div class="sec-head"><span class="badge">Team edition · coming next</span><h2>Built for founders. Ready for the whole company.</h2><p class="lede">Today Onecal runs in each person's own Google account. The team edition adds admin install for chosen groups, sharing policies, model settings and an exportable audit log.</p>
+      <div class="sec-head"><span class="badge">Team edition · coming next</span><h2>For larger teams</h2><p class="lede">Today Onecal runs in each person's own Google account. The team edition adds admin install for chosen groups, sharing policies, model settings and an exportable audit log.</p>
         <ul class="ticks"><li>Each person still consents to their own inbox</li><li>Admins never get silent access to anyone's Gmail</li><li>Choose the AI model that reads scheduling emails</li></ul></div>
       <div class="win"><div class="scroll-x"><div class="admin">
         <div class="admin-nav"><div>Overview</div><div class="on">Accounts</div><div>Groups</div><div>Sharing</div><div>AI settings</div><div>Audit log</div></div>
@@ -562,7 +550,7 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
 
   <section style="padding-top:0">
     <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">Principles</span><h2>A calm chief of staff, not a black box.</h2></div>
+      <div class="sec-head"><span class="eyebrow">How it decides</span><h2>It shows its work</h2></div>
       <div class="principles">
         <div><span class="k">dry run</span><h4>Preview before writing</h4><p>See every proposed change before the first event is created.</p></div>
         <div><span class="k">evidence</span><h4>Explain every decision</h4><p>Each add, skip, merge or change keeps its reason and source.</p></div>
@@ -572,14 +560,28 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
     </div>
   </section>
 
+  <section id="faq" style="padding-top:0">
+    <div class="wrap faq">
+      <div class="sec-head"><span class="eyebrow">FAQ</span><h2>Questions</h2></div>
+      <div class="qs">
+        <details open><summary>What does Onecal read?</summary><p>Your Google Calendars and Gmail threads that look like scheduling: invites, booking confirmations and replies such as "Thursday at 4 works". Newsletters and promotions are filtered out before anything is read closely.</p></details>
+        <details><summary>Does it send my email anywhere?</summary><p>Only threads that look like scheduling are sent to an AI model, and only to work out the date, time and people. Gmail access is read-only.</p></details>
+        <details><summary>What happens if it gets a meeting wrong?</summary><p>Unclear meetings are added as tentative with a (?) and the reason, or skipped. Every decision is in the log with the email line it used, so you can check it and remove the event.</p></details>
+        <details><summary>Does it work with Outlook or iCloud?</summary><p>Not yet. Onecal works with Gmail and Google Calendar today.</p></details>
+        <details><summary>Who can see the shared calendar?</summary><p>Only the people you share it with. It's a normal Google Calendar, so you control access the usual way.</p></details>
+        <details><summary>How much does it cost?</summary><p>Onecal is in early access. Write to us and we'll set it up with your team.</p></details>
+      </div>
+    </div>
+  </section>
+
   <section id="access" style="padding-top:0">
     <div class="wrap">
       <div class="cta">
         <span class="eyebrow">Early access</span>
-        <h2>Stop checking five calendars.</h2>
+        <h2>Try Onecal with your team</h2>
         <p>We're onboarding a small number of founding teams. Write to us and we'll set Onecal up with you.</p>
         <div class="addr"><span id="addr">founders@tryamp.in</span><button class="btn sm" id="copy" type="button">Copy email</button></div>
-        <svg class="cta-lanes" viewBox="0 0 1200 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 C 400 10, 500 60, 1200 60" stroke="#4CC0B1"/><path d="M0 35 C 400 35, 500 60, 1200 60" stroke="#E2A100" style="animation-delay:-.5s"/><path d="M0 62 C 400 62, 500 60, 1200 60" stroke="#7FB7A4" style="animation-delay:-1s"/></svg>
+        
       </div>
     </div>
   </section>
@@ -587,8 +589,13 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
 
 <footer>
   <div class="wrap">
-    <a class="logo" href="#top"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke-width="5" stroke-linecap="round"><path d="M6 13 C 26 13, 30 25, 44 26" stroke="var(--teal)"/><path d="M6 25 C 24 25, 30 30, 44 30.5" stroke="var(--sage)"/><path d="M6 39 C 24 39, 30 34, 44 33.5" stroke="var(--marigold)"/><path d="M6 51 C 26 51, 30 39, 44 38" stroke="var(--aqua)"/></g><rect x="46" y="10" width="10" height="44" rx="3" fill="var(--ink)"/></svg>Onecal</a>
-    <span>Screens shown are previews of the Onecal app. Names and meetings are examples.</span>
+    <div class="foot">
+      <div><a class="logo" href="#top"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke-width="5" stroke-linecap="round"><path d="M6 13 C 26 13, 30 25, 44 26" stroke="var(--teal)"/><path d="M6 25 C 24 25, 30 30, 44 30.5" stroke="var(--sage)"/><path d="M6 39 C 24 39, 30 34, 44 33.5" stroke="var(--marigold)"/><path d="M6 51 C 26 51, 30 39, 44 38" stroke="var(--aqua)"/></g><rect x="46" y="10" width="10" height="44" rx="3" fill="var(--ink)"/></svg>Onecal</a><p>Every inbox and calendar on your team, in one shared Google Calendar.</p></div>
+      <div><h4>Product</h4><ul><li><a href="#how">How it works</a></li><li><a href="#brief">Morning brief</a></li><li><a href="#teams">For larger teams</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#faq">FAQ</a></li><li><a href="#access">Early access</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li>founders@tryamp.in</li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Onecal</span><span>Screens are previews of the Onecal app. Names and meetings are examples.</span></div>
   </div>
 </footer>
 
@@ -601,125 +608,6 @@ footer .logo { font-size: 18px } footer .logo svg { width: 22px; height: 22px }
     var select = function () { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); };
     try { navigator.clipboard.writeText(el.textContent).then(done, select); } catch (e) { select(); }
   });
-  // Hero lanes: one curve from each inbox card into the calendar's left edge.
-  var stage = document.querySelector('.stage'), svg = document.getElementById('lanes'), cal = document.querySelector('.calwin');
-  function lanes() {
-    if (getComputedStyle(svg).display === 'none') return;
-    var b = stage.getBoundingClientRect(), c = cal.getBoundingClientRect();
-    var tx = c.left - b.left + 2, ty = c.top - b.top + Math.min(c.height / 2, 170);
-    stage.querySelectorAll('.src').forEach(function (s, k) {
-      var r = s.getBoundingClientRect(), x = r.right - b.left, y = r.top - b.top + r.height / 2, mx = (x + tx) / 2;
-      svg.children[k].setAttribute('d', 'M' + x + ' ' + y + ' C ' + mx + ' ' + y + ', ' + mx + ' ' + ty + ', ' + tx + ' ' + ty);
-    });
-  }
-  lanes(); addEventListener('resize', lanes); document.fonts && document.fonts.ready.then(lanes);
-
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  // Packets travel each hero lane; when one lands, a meeting in the calendar lights up.
-  var evs = [].slice.call(document.querySelectorAll('#calgrid .ev'));
-  var colors = ['#17756B', '#7FB7A4', '#E2A100', '#4CC0B1'];
-  var packets = [].slice.call(svg.children).map(function (path, k) {
-    var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    c.setAttribute('r', '5'); c.setAttribute('class', 'packet'); c.style.color = colors[k];
-    svg.appendChild(c);
-    return { path: path, el: c, t: k * 0.27, speed: 0.32 + k * 0.03 };
-  });
-  var last = performance.now();
-  function step(now) {
-    var dt = Math.min(0.05, (now - last) / 1000); last = now;
-    if (getComputedStyle(svg).display !== 'none') {
-      packets.forEach(function (p) {
-        p.t += dt * p.speed;
-        if (p.t >= 1) {
-          p.t = 0;
-          var ev = evs[Math.floor(Math.random() * evs.length)];
-          ev.classList.remove('ping'); void ev.offsetWidth; ev.classList.add('ping');
-        }
-        var len = p.path.getTotalLength();
-        if (!len) return;
-        var e = 1 - Math.pow(1 - p.t, 2), pt = p.path.getPointAtLength(e * len);
-        p.el.setAttribute('cx', pt.x); p.el.setAttribute('cy', pt.y);
-        p.el.style.opacity = p.t < 0.05 ? p.t * 20 : p.t > 0.93 ? (1 - p.t) * 14 : 1;
-      });
-    }
-    requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-
-  // Gentle tilt of the hero calendar toward the pointer.
-  if (matchMedia('(pointer: fine)').matches) {
-    stage.addEventListener('pointermove', function (e) {
-      var r = cal.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-      cal.style.transform = 'perspective(1400px) rotateY(' + (x * 4) + 'deg) rotateX(' + (-y * 3) + 'deg)';
-      lanes();
-    });
-    stage.addEventListener('pointerleave', function () { cal.style.transform = ''; setTimeout(lanes, 520); });
-  }
-
-  // The "☀ Today" bar rewrites itself, like the real all-day item.
-  var todays = ['☀ Today: 10:30 Maya · 13:00 Northwind · 16:00 Product sync', '☀ Left today: 13:00 Northwind · 16:00 Product sync', '☀ Left today: 16:00 Product sync'];
-  var ti = 0, tt = document.getElementById('todaytxt');
-  setInterval(function () { ti = (ti + 1) % todays.length; tt.classList.add('swap'); setTimeout(function () { tt.textContent = todays[ti]; tt.classList.remove('swap'); }, 350); }, 4000);
-
-  // Sections glide up as they scroll into view (they are fully visible at rest).
-  var io = 'IntersectionObserver' in window && new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-  }, { rootMargin: '0px 0px -8% 0px' });
-  if (io) document.querySelectorAll('.row, .feat, .demo > *, .brief > *, .teams > *, .principles > div, .cta').forEach(function (el, k) {
-    if (el.getBoundingClientRect().top < innerHeight) return;
-    el.classList.add('reveal'); el.style.transitionDelay = (k % 3) * 0.08 + 's'; io.observe(el);
-  });
-
-  // Onboarding: Sam's calendar connects, then the loop starts again.
-  var sam = document.getElementById('samst'), samLane = document.getElementById('samlane');
-  var samStates = [['Connect', 'wait', true], ['Connecting', 'busy', true], ['Connected', 'ok', false]], si = 0;
-  function samTick() { var st = samStates[si]; sam.textContent = st[0]; sam.className = 'st ' + st[1]; samLane.classList.toggle('off', st[2]); si = (si + 1) % samStates.length; }
-  samTick(); setInterval(samTick, 1800);
-
-  // Dry run: confidence scores count up when the card comes into view.
-  var counted = false, scores = document.querySelectorAll('[data-count]');
-  function countUp() {
-    if (counted) return; counted = true;
-    scores.forEach(function (el) {
-      var to = parseFloat(el.dataset.count), t0 = performance.now();
-      (function f(now) { var k = Math.min(1, (now - t0) / 1100); el.textContent = (to * (1 - Math.pow(1 - k, 3))).toFixed(2); if (k < 1) requestAnimationFrame(f); })(t0);
-    });
-  }
-  if (io) { var io2 = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { countUp(); io2.disconnect(); } }); io2.observe(document.querySelector('.rev')); }
-
-  // Decision log: new decisions stream in at the top.
-  var pool = [
-    ['Partnership · Lumen', 'created', 'teal', 'P+D', '0.94', '', 'Confirmed invite'],
-    ['Accelerator interview', 'merged', '', 'P+D+S', '0.98', '', 'Same invite in 3 inboxes'],
-    ['Coffee with Arjun', 'tentative', 'gold', 'S', '0.66', 'mid', '"Maybe Thursday?" not confirmed'],
-    ['CS-2201 lecture', 'skipped', '', '–', '–', '', 'University class'],
-    ['Board prep', 'updated', 'gold', 'P+D+S', '0.91', '', 'Moved to Fri 15:00']
-  ], pi = 0, mins = 40, tbody = document.querySelector('#logtable tbody');
-  setInterval(function () {
-    var r = pool[pi]; pi = (pi + 1) % pool.length; mins = (mins + 7) % 60;
-    var tr = document.createElement('tr'); tr.className = 'new';
-    tr.innerHTML = '<td>28 Oct 15:' + String(mins).padStart(2, '0') + '</td><td><span class="tag ' + r[2] + '">' + r[1] + '</span></td><td>' + r[0] + '</td><td class="mono">' + r[3] + '</td><td>' + (r[4] === '–' ? '–' : '<span class="score ' + r[5] + '">' + r[4] + '</span>') + '</td><td>' + r[6] + '</td>';
-    tbody.insertBefore(tr, tbody.firstChild);
-    while (tbody.children.length > 5) tbody.removeChild(tbody.lastElementChild);
-  }, 3000);
-
-  var states = [
-    ['7:00', 'now', '☀ Today: 10:30 Intro with Maya · 13:00 Northwind demo · 16:00 Product sync'],
-    ['11:02', '11:00', '☀ Left today: 13:00 Northwind demo · 16:00 Product sync'],
-    ['15:51', '15:50', 'Product sync in 10 minutes · Room 4'],
-    ['19:04', '19:00', '☀ Today: all 3 meetings done']
-  ];
-  var i = 0, note = document.getElementById('pnote');
-  setInterval(function () {
-    i = (i + 1) % states.length;
-    note.classList.add('swap');
-    setTimeout(function () {
-      document.getElementById('pclock').textContent = states[i][0];
-      document.getElementById('pwhen').textContent = states[i][1];
-      document.getElementById('ptitle').textContent = states[i][2];
-      note.classList.remove('swap');
-    }, 350);
-  }, 3200);
 })();
 </script>
 
