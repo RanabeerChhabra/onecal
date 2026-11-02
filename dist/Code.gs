@@ -1,4 +1,4 @@
-// Founders Meeting Agent — single-file build 2026-10-27 19:32 UTC. Do not edit here; edit src/ and run `npm run bundle`.
+// Founders Meeting Agent — single-file build 2026-11-02 20:48 UTC. Do not edit here; edit src/ and run `npm run bundle`.
 // Paste this whole file into Code.gs of a new Apps Script project in each account. See README.
 
 // ===== Founders Meeting Agent: shared configuration =====

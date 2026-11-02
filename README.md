@@ -11,7 +11,7 @@ Reads every Gmail inbox and Google Calendar the founders connect and finds every
 
 It's free to run: no servers, no Google Cloud project, no billing. The only cost is the AI model that reads emails, DeepSeek or Claude (your choice): a few dollars to start, then cents a month.
 
-> **Our accounts, who does what and in which order:** [docs/OUR_SETUP.md](docs/OUR_SETUP.md).
+> **Public copy.** Email addresses and meeting details in this repo are placeholders. Set your own accounts in the `CONFIG` block of `src/Config.js`.
 
 ---
 
@@ -92,7 +92,7 @@ Re-paste `dist/Code.gs` into each copy and save. Settings, cursors and the calen
 ## If something is blocked
 
 - **"… can only view the shared calendar"** or the share email never arrives: the owner's domain only allows sharing free/busy outside the organisation. In the owner domain's Admin console go to *Apps → Google Workspace → Calendar → Sharing settings → External sharing options for secondary calendars* and choose **Share all information, and outsiders can change calendars**. Then run `setup()` again in the owner's account.
-- **"This app is blocked" / "admin_policy_enforced"** when authorizing: the account's Workspace admin restricts Apps Script or Gmail access. Ask IT to allow Apps Script for your account. The request template is in [docs/OUR_SETUP.md](docs/OUR_SETUP.md).
+- **"This app is blocked" / "admin_policy_enforced"** when authorizing: the account's Workspace admin restricts Apps Script or Gmail access. Ask IT to allow Apps Script for your account.
 - **"Exception: … UrlFetchApp"**: the admin blocks scripts from calling outside services, so Claude can't be reached. Same fix: ask IT.
 
 ## Phone: widget + reminders (no custom app needed)
